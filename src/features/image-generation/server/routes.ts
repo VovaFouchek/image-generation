@@ -1,0 +1,80 @@
+import "server-only";
+import { createBatchBodySchema } from "../domain/request";
+import { getRequestContext } from "./context";
+import {
+  createSingleBatch,
+  createVariationsBatch,
+  getBatch,
+  getItemImage,
+  runItem,
+} from "./generation-service";
+import { toErrorResponse } from "./http";
+import { toBatchView, toItemView } from "./views";
+
+// Route handlers owned by the feature. The host mounts each with a one-line re-export, so
+// moving the feature into the platform means copying this folder and adding the route files.
+// Params are typed generically: the URL shape belongs to the host, not to the feature.
+
+type Params<T extends string> = { params: Promise<Record<T, string>> };
+
+/** POST — plans a batch (brief + prompts). Does not call the provider. */
+export async function createBatchRoute(request: Request) {
+  try {
+    const body = createBatchBodySchema.parse(await request.json());
+    const ctx = await getRequestContext();
+    const batch =
+      body.kind === "single"
+        ? await createSingleBatch(ctx, body.request)
+        : await createVariationsBatch(ctx, body.from);
+    return Response.json(toBatchView(batch), { status: 201 });
+  } catch (error) {
+    return toErrorResponse(error);
+  }
+}
+
+/** GET — current state of a batch and its items. */
+export async function getBatchRoute(
+  _request: Request,
+  { params }: Params<"batchId">,
+) {
+  try {
+    const { batchId } = await params;
+    const batch = await getBatch(await getRequestContext(), batchId);
+    return Response.json(toBatchView(batch));
+  } catch (error) {
+    return toErrorResponse(error);
+  }
+}
+
+/** POST — generates one item (or retries a failed one). One provider call per request. */
+export async function runItemRoute(
+  _request: Request,
+  { params }: Params<"batchId" | "itemId">,
+) {
+  try {
+    const { batchId, itemId } = await params;
+    const item = await runItem(await getRequestContext(), batchId, itemId);
+    return Response.json(toItemView(item));
+  } catch (error) {
+    return toErrorResponse(error);
+  }
+}
+
+/** GET — the generated image, scoped to the caller's tenant. */
+export async function getImageRoute(
+  _request: Request,
+  { params }: Params<"itemId">,
+) {
+  try {
+    const { itemId } = await params;
+    const image = await getItemImage(await getRequestContext(), itemId);
+    return new Response(Buffer.from(image.data), {
+      headers: {
+        "Content-Type": image.mimeType,
+        "Cache-Control": "private, max-age=3600",
+      },
+    });
+  } catch (error) {
+    return toErrorResponse(error);
+  }
+}
