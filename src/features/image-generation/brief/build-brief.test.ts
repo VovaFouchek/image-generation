@@ -66,7 +66,7 @@ describe("buildBrief", () => {
   it("copies resolved values so the brief alone reproduces the prompt", () => {
     const brief = buildBrief(GLOBAL_KNOWLEDGE, fresh, freshRequest());
 
-    expect(brief.intent.pageTitle).toBe("Fresh produce delivery");
+    expect(brief.intent.pageTitle).toBe("Fresh salads and vegetables delivery");
     expect(brief.audience.label).toBe("Households");
     expect(brief.scene.narrative).toContain("in a Dutch family home");
     expect(brief.scene.marketSetting).toContain("Dutch");
