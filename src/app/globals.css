@@ -2,6 +2,14 @@
 @import "../ui/styles/tokens.css";
 
 @layer base {
+  button:enabled {
+    @apply cursor-pointer;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
+
   body {
     @apply bg-canvas font-sans text-text antialiased;
   }
