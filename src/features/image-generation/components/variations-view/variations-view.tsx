@@ -2,6 +2,7 @@
 
 import type { BatchView } from "../../domain/views";
 import { useBatchRunner } from "../../hooks/use-batch-runner";
+import { BatchEmptyState } from "../batch-empty-state";
 import { BatchToolbar } from "../batch-toolbar";
 import { StatusSummary } from "../status-summary";
 import { VariantCard } from "../variant-card";
@@ -57,7 +58,11 @@ export function VariationsView({
             ))}
           </VariantGrid>
         </>
-      ) : null}
+      ) : (
+        <div className="flex flex-1 items-center justify-center">
+          <BatchEmptyState />
+        </div>
+      )}
     </>
   );
 }

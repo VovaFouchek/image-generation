@@ -44,6 +44,11 @@ export const GENERATOR_TEXT = {
 } as const;
 
 export const VARIATIONS_TEXT = {
+  empty: {
+    title: "Create your image collection",
+    description:
+      "Generate 15 variations using your selected style, colors and format. Each image will appear here as it becomes ready.",
+  },
   header: (brandName: string) => `${brandName} — Beeldgenerator`,
   title: "Beeldbank — 15 variaties",
   subtitle:
