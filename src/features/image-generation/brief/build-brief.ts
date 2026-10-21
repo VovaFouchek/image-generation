@@ -8,6 +8,7 @@ import type {
   Rule,
   TenantKnowledge,
 } from "../knowledge/types";
+import { resolveVisualStyle } from "./resolve-visual-style";
 import {
   BRIEF_SCHEMA_VERSION,
   type Accent,
@@ -18,13 +19,6 @@ import {
 } from "./types";
 
 const WHITE = "#FFFFFF";
-
-const STYLE_TEXT = {
-  simple:
-    "Clean, uncluttered composition with one clear subject and generous calm space",
-  abstract:
-    "Abstract, non-literal visual metaphor built from shapes, textures and light",
-} as const;
 
 /**
  * Merges the three layers into one brief. Deterministic on purpose (no LLM):
@@ -62,6 +56,19 @@ export function buildBrief(
 
   const format = FORMATS[request.format];
   const accent = toAccent(mainColor, page.accentAnchor);
+  const { composition, ...visualStyle } = resolveVisualStyle(tenant, request);
+  const styleProvenance: Provenance[] =
+    request.style === "simple"
+      ? [
+          { source: "request", field: "style" },
+          { source: "tenant", field: "photography" },
+        ]
+      : request.style === "other"
+        ? [
+            { source: "request", field: "style" },
+            { source: "request", field: "styleNote" },
+          ]
+        : [{ source: "request", field: "style" }];
 
   return {
     schemaVersion: BRIEF_SCHEMA_VERSION,
@@ -94,23 +101,10 @@ export function buildBrief(
       abstract,
     },
     visualLanguage: {
-      medium: abstract
-        ? `an abstract image in the visual language of ${tenant.brandName}`
-        : tenant.photography.medium,
-      // The tenant's photo style applies to photographic styles; Abstract replaces it.
-      style: abstract
-        ? STYLE_TEXT.abstract
-        : request.style === "other"
-          ? `${tenant.photography.style}. Style as requested by the user: "${toInlineData(request.styleNote ?? "", 200)}"`
-          : `${tenant.photography.style}. ${STYLE_TEXT.simple}`,
-      lighting: tenant.photography.lighting,
+      ...visualStyle,
       color: toColorTreatment(request, tenant.photography.palette, accent),
     },
-    composition: {
-      shot: tenant.photography.shot,
-      cameraAngle: tenant.photography.defaultCameraAngle,
-      placement: tenant.photography.defaultPlacement,
-    },
+    composition,
     format: {
       key: request.format,
       aspectRatio: format.aspectRatio,
@@ -147,24 +141,15 @@ export function buildBrief(
         { source: "request", field: "style" },
         { source: "tenant", field: "marketSetting" },
       ],
-      "visualLanguage.medium": [
-        { source: "tenant", field: "photography.medium" },
-      ],
-      "visualLanguage.style": abstract
-        ? [{ source: "request", field: "style" }]
-        : [
-            { source: "request", field: "style" },
-            { source: "tenant", field: "photography.style" },
-          ],
-      "visualLanguage.lighting": [
-        { source: "tenant", field: "photography.lighting" },
-      ],
+      "visualLanguage.medium": styleProvenance,
+      "visualLanguage.style": styleProvenance,
+      "visualLanguage.lighting": styleProvenance,
       "visualLanguage.color": [
         { source: "request", field: "colorMode" },
         { source: "request", field: "mainColorId" },
         { source: "tenant", field: "palette" },
       ],
-      composition: [{ source: "tenant", field: "photography" }],
+      composition: styleProvenance,
       format: [{ source: "request", field: "format" }],
     },
   };
