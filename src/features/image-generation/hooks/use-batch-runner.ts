@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createBatch, getBatch, runItem } from "../client/api";
-import { SCREEN_2 } from "../components/copy";
+import { VARIATIONS_TEXT } from "../texts";
 import type { BatchView, ItemView } from "../domain/views";
 
 const POLL_INTERVAL_MS = 3_000;
@@ -62,7 +62,7 @@ export function useBatchRunner({
         status: "failed",
         error: {
           kind: "transient",
-          message: SCREEN_2.network,
+          message: VARIATIONS_TEXT.network,
           retryable: true,
         },
       });
@@ -144,7 +144,7 @@ export function useBatchRunner({
       await runAll(created, created.items);
     } catch {
       setCreating(false);
-      setError(SCREEN_2.network);
+      setError(VARIATIONS_TEXT.network);
     }
   }
 

@@ -44,7 +44,7 @@ export const GLOBAL_KNOWLEDGE: GlobalKnowledge = {
 const TENANTS: Record<string, TenantKnowledge> = {
   "demo-cargo": {
     tenantId: "demo-cargo",
-    version: "demo-2026-10-21",
+    version: "demo-2026-10-21-en",
     brandName: "Bakfiets Bezorgd (demo)",
     brandDescription: "a local delivery service that uses electric cargo bikes",
     brandPersonality: "Calm, practical and friendly; never hurried.",
@@ -87,7 +87,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
     segments: [
       {
         id: "families",
-        label: "Gezinnen",
+        label: "Families",
         description: "families receiving everyday deliveries at home",
         setting: "outside a family home on a quiet residential street",
         mood: "warm and reassuring",
@@ -95,7 +95,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
       },
       {
         id: "shops",
-        label: "Ondernemers",
+        label: "Business owners",
         description: "local shop owners who send and receive goods",
         setting:
           "in front of a small independent shop on a neighbourhood shopping street",
@@ -106,10 +106,10 @@ const TENANTS: Record<string, TenantKnowledge> = {
     pages: [
       {
         id: "city-delivery",
-        url: "https://example.com/bezorging-in-de-stad",
-        title: "Bezorging in de stad",
+        url: "https://example.com/city-delivery",
+        title: "City delivery",
         summary:
-          "Dezelfde dag bezorgd met de bakfiets binnen de ring: stil en zonder uitstoot.",
+          "Same-day cargo-bike delivery within the ring road: quiet and emission-free.",
         message: "show that city deliveries can be quiet, clean and personal",
         subject:
           "a courier lifts a parcel from the cargo box of an electric cargo bike",
@@ -117,10 +117,10 @@ const TENANTS: Record<string, TenantKnowledge> = {
       },
       {
         id: "pricing",
-        url: "https://example.com/tarieven",
-        title: "Tarieven",
+        url: "https://example.com/pricing",
+        title: "Pricing",
         summary:
-          "Eenvoudige vaste tarieven voor kleine ondernemers, zonder abonnement.",
+          "Simple flat rates for small businesses, with no subscription.",
         message: "show that sending parcels is simple and predictable",
         subject:
           "neatly stacked parcels wait in the cargo box of a parked electric cargo bike",
@@ -130,7 +130,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
   },
   "demo-mortgage": {
     tenantId: "demo-mortgage",
-    version: "demo-2026-10-21",
+    version: "demo-2026-10-21-en",
     brandName: "Helder Hypotheek (demo)",
     brandDescription: "an independent mortgage advisor",
     brandPersonality:
@@ -173,7 +173,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
     segments: [
       {
         id: "starters",
-        label: "Starters",
+        label: "First-time buyers",
         description: "first-time buyers getting the keys to their first home",
         setting: "a young couple at the front door of their first apartment",
         mood: "hopeful and calm",
@@ -181,7 +181,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
       },
       {
         id: "movers",
-        label: "Doorstromers",
+        label: "Home movers",
         description: "homeowners moving to a bigger family home",
         setting:
           "the empty, sunlit living room of a family house ready to move into",
@@ -190,7 +190,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
       },
       {
         id: "entrepreneurs",
-        label: "Ondernemers",
+        label: "Self-employed buyers",
         description:
           "self-employed buyers who need advice tailored to their income",
         setting: "a tidy home office corner with a desk by the window",
@@ -201,10 +201,10 @@ const TENANTS: Record<string, TenantKnowledge> = {
     pages: [
       {
         id: "first-home",
-        url: "https://example.com/eerste-huis",
-        title: "Je eerste huis kopen",
+        url: "https://example.com/first-home",
+        title: "Buying your first home",
         summary:
-          "Stap voor stap naar je eerste hypotheek, met een vaste adviseur.",
+          "Step-by-step guidance to your first mortgage, with a dedicated advisor.",
         message: "show that buying a first home can feel clear and manageable",
         subject:
           "a set of house keys rests on a windowsill next to a small plant",
@@ -212,10 +212,10 @@ const TENANTS: Record<string, TenantKnowledge> = {
       },
       {
         id: "advice",
-        url: "https://example.com/advies",
-        title: "Hypotheekadvies",
+        url: "https://example.com/mortgage-advice",
+        title: "Mortgage advice",
         summary:
-          "Onafhankelijk advies zonder verrassingen, ook voor ondernemers.",
+          "Independent advice with no surprises, including for self-employed buyers.",
         message: "show calm, independent expertise",
         subject: "an open notebook and a cup of coffee on a clean oak table",
         accentAnchor: "the notebook cover",

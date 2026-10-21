@@ -1,6 +1,6 @@
 import { Badge, cn, focusRing } from "@/ui";
 import type { ItemView } from "../../domain/views";
-import { SCREEN_2 } from "../copy";
+import { VARIATIONS_TEXT } from "../../texts";
 
 export interface StatusSummaryProps {
   items: ItemView[];
@@ -22,10 +22,10 @@ export function StatusSummary({ items, onRetryFailed }: StatusSummaryProps) {
   return (
     <div className="flex flex-wrap items-center gap-3" aria-live="polite">
       <Badge tone="success" size="pill">
-        {SCREEN_2.counts.done(done)}
+        {VARIATIONS_TEXT.counts.done(done)}
       </Badge>
       <Badge tone="warning" size="pill">
-        {SCREEN_2.counts.busy(busy)}
+        {VARIATIONS_TEXT.counts.busy(busy)}
       </Badge>
       {failed.length > 0 ? (
         <button
@@ -35,7 +35,7 @@ export function StatusSummary({ items, onRetryFailed }: StatusSummaryProps) {
           className={cn("rounded-pill disabled:cursor-not-allowed", focusRing)}
         >
           <Badge tone="danger" size="pill">
-            {SCREEN_2.counts.failed(failed.length)}
+            {VARIATIONS_TEXT.counts.failed(failed.length)}
           </Badge>
         </button>
       ) : null}

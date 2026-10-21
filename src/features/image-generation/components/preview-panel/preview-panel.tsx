@@ -7,14 +7,14 @@ import {
   type MediaState,
 } from "@/ui";
 import type { PreviewState } from "../../hooks/use-generation-form";
-import { SCREEN_1 } from "../copy";
+import { GENERATOR_TEXT } from "../../texts";
 
 const BADGES: Record<PreviewState["kind"], { tone: BadgeTone; label: string }> =
   {
-    idle: { tone: "neutral", label: SCREEN_1.status.idle },
-    generating: { tone: "warning", label: SCREEN_1.status.generating },
-    ready: { tone: "success", label: SCREEN_1.status.ready },
-    failed: { tone: "danger", label: SCREEN_1.status.failed },
+    idle: { tone: "neutral", label: GENERATOR_TEXT.status.idle },
+    generating: { tone: "warning", label: GENERATOR_TEXT.status.generating },
+    ready: { tone: "success", label: GENERATOR_TEXT.status.ready },
+    failed: { tone: "danger", label: GENERATOR_TEXT.status.failed },
   };
 
 export interface PreviewPanelProps {
@@ -25,12 +25,12 @@ export interface PreviewPanelProps {
 export function PreviewPanel({ preview, continueHref }: PreviewPanelProps) {
   const badge =
     preview.kind === "ready" && preview.stale
-      ? { tone: "neutral" as const, label: SCREEN_1.status.stale }
+      ? { tone: "neutral" as const, label: GENERATOR_TEXT.status.stale }
       : BADGES[preview.kind];
 
   return (
     <Panel
-      title={SCREEN_1.previewTitle}
+      title={GENERATOR_TEXT.previewTitle}
       className="flex-1"
       aside={
         <div className="flex items-center gap-3">
@@ -38,7 +38,9 @@ export function PreviewPanel({ preview, continueHref }: PreviewPanelProps) {
             {badge.label}
           </Badge>
           {preview.kind === "ready" && continueHref ? (
-            <LinkButton href={continueHref}>{SCREEN_1.continue}</LinkButton>
+            <LinkButton href={continueHref}>
+              {GENERATOR_TEXT.continue}
+            </LinkButton>
           ) : null}
         </div>
       }
@@ -52,8 +54,8 @@ export function PreviewPanel({ preview, continueHref }: PreviewPanelProps) {
         state={toMediaState(preview)}
         statusLabel={
           preview.kind === "generating"
-            ? SCREEN_1.status.generating
-            : SCREEN_1.status.failed
+            ? GENERATOR_TEXT.status.generating
+            : GENERATOR_TEXT.status.failed
         }
       />
     </Panel>
@@ -70,7 +72,7 @@ function toMediaState(preview: PreviewState): MediaState {
       return {
         kind: "image",
         src: preview.item.imageUrl,
-        alt: SCREEN_1.imageAlt,
+        alt: GENERATOR_TEXT.imageAlt,
       };
     case "failed":
       return { kind: "error" };

@@ -6,7 +6,7 @@ import { getServerConfig } from "../../server/config";
 import { getRequestContext } from "../../server/context";
 import { getBatch, getFormOptions } from "../../server/generation-service";
 import { toBatchView } from "../../server/views";
-import { SCREEN_2 } from "../copy";
+import { VARIATIONS_TEXT } from "../../texts";
 import { VariationsView } from "../variations-view";
 
 export interface BatchScreenProps {
@@ -42,7 +42,7 @@ export async function BatchScreen({
   const { brandName } = await getFormOptions(ctx);
   return (
     <PageShell
-      header={<AppHeader title={SCREEN_2.header(brandName)} />}
+      header={<AppHeader title={VARIATIONS_TEXT.header(brandName)} />}
       className="gap-6"
     >
       <VariationsView

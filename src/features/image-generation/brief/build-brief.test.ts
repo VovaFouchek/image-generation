@@ -35,8 +35,8 @@ describe("buildBrief", () => {
   it("copies resolved values so the brief alone reproduces the prompt", () => {
     const brief = buildBrief(GLOBAL_KNOWLEDGE, cargo, cargoRequest());
 
-    expect(brief.intent.pageTitle).toBe("Bezorging in de stad");
-    expect(brief.audience.label).toBe("Gezinnen");
+    expect(brief.intent.pageTitle).toBe("City delivery");
+    expect(brief.audience.label).toBe("Families");
     expect(brief.scene.narrative).toContain("outside a family home");
     expect(brief.scene.marketSetting).toContain("Dutch");
     expect(brief.visualLanguage.color).toEqual({

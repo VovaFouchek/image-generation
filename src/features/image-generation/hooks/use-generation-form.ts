@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ApiError, createBatch, runItem } from "../client/api";
-import { SCREEN_1 } from "../components/copy";
+import { GENERATOR_TEXT } from "../texts";
 import type { ColorMode, Format, Style } from "../domain/options";
 import type { GenerationRequest } from "../domain/request";
 import type { FormOptionsView, ItemView } from "../domain/views";
@@ -27,12 +27,10 @@ export type PreviewState =
       kind: "ready";
       batchId: string;
       item: Extract<ItemView, { status: "succeeded" }>;
-      /** The form changed after this example: it no longer matches the settings. */
       stale: boolean;
     }
   | { kind: "failed"; message: string };
 
-/** Screen 1: form values, validation errors and the single generation (create + run). */
 export function useGenerationForm(options: FormOptionsView) {
   const [values, setValues] = useState<FormValues>({
     pageId: "",
@@ -50,7 +48,7 @@ export function useGenerationForm(options: FormOptionsView) {
   function setValue<K extends FormField>(field: K, value: FormValues[K]) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
-    // Variations must follow the settings on screen, so an older example can't be continued.
+
     setPreview((current) =>
       current.kind === "ready" && !current.stale
         ? { ...current, stale: true }
@@ -82,7 +80,7 @@ export function useGenerationForm(options: FormOptionsView) {
               message:
                 result.status === "failed"
                   ? result.error.message
-                  : SCREEN_1.errors.network,
+                  : GENERATOR_TEXT.errors.network,
             },
       );
     } catch (error) {
@@ -91,7 +89,7 @@ export function useGenerationForm(options: FormOptionsView) {
         if (Object.keys(fieldErrors).length > 0) setErrors(fieldErrors);
         setPreview({ kind: "failed", message: error.message });
       } else {
-        setPreview({ kind: "failed", message: SCREEN_1.errors.network });
+        setPreview({ kind: "failed", message: GENERATOR_TEXT.errors.network });
       }
     }
   }
@@ -103,10 +101,10 @@ function requiredErrors(
   values: FormValues,
 ): Partial<Record<FormField, string>> {
   return {
-    ...(values.pageId ? {} : { pageId: SCREEN_1.errors.pageId }),
+    ...(values.pageId ? {} : { pageId: GENERATOR_TEXT.errors.pageId }),
     ...(values.brandSegmentId
       ? {}
-      : { brandSegmentId: SCREEN_1.errors.brandSegmentId }),
+      : { brandSegmentId: GENERATOR_TEXT.errors.brandSegmentId }),
   };
 }
 

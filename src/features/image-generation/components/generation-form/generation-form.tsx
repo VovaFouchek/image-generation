@@ -18,7 +18,7 @@ import {
 } from "../../domain/options";
 import type { FormOptionsView } from "../../domain/views";
 import type { FormField, FormValues } from "../../hooks/use-generation-form";
-import { SCREEN_1 } from "../copy";
+import { GENERATOR_TEXT } from "../../texts";
 
 export interface GenerationFormProps {
   options: FormOptionsView;
@@ -39,7 +39,7 @@ export function GenerationForm({
   onSubmit,
 }: GenerationFormProps) {
   const id = useId();
-  const copy = SCREEN_1;
+  const copy = GENERATOR_TEXT;
 
   return (
     <Panel title={copy.formTitle} className="flex-1">

@@ -9,9 +9,7 @@ export type MediaState =
   | { kind: "error" };
 
 const VARIANTS = {
-  // Preview area (3:55): fills the panel; the image keeps its own aspect ratio.
   preview: "min-h-0 flex-1 rounded-button",
-  // Variant tile (13:24): fixed 140px high, image cropped to fill.
   tile: "h-35 w-full shrink-0",
 } as const;
 
@@ -25,12 +23,10 @@ const STATE_SURFACES = {
 export interface MediaFrameProps {
   state: MediaState;
   variant?: keyof typeof VARIANTS;
-  /** Screen-reader text for loading/error ("Generating…", "Bezig…"); language is the caller's. */
   statusLabel?: string;
   className?: string;
 }
 
-/** Shows one image slot in its empty, loading, image or error state. */
 export function MediaFrame({
   state,
   variant = "preview",

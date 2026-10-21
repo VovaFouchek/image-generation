@@ -1,6 +1,6 @@
-import type { ProviderErrorKind } from "../domain/errors";
+import type { ProviderErrorKind } from "./domain/errors";
 
-export const SCREEN_1 = {
+export const GENERATOR_TEXT = {
   header: (brandName: string) => `${brandName} - image generator`,
   step: "Step 1 of 2",
   formTitle: "Generate a new image",
@@ -43,7 +43,7 @@ export const SCREEN_1 = {
   },
 } as const;
 
-export const SCREEN_2 = {
+export const VARIATIONS_TEXT = {
   header: (brandName: string) => `${brandName} — Beeldgenerator`,
   title: "Beeldbank — 15 variaties",
   subtitle:

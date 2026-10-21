@@ -7,13 +7,13 @@ import {
   type MediaState,
 } from "@/ui";
 import type { ItemView } from "../../domain/views";
-import { SCREEN_2 } from "../copy";
+import { VARIATIONS_TEXT } from "../../texts";
 
 const STATUS: Record<ItemView["status"], { tone: BadgeTone; label: string }> = {
-  queued: { tone: "warning", label: SCREEN_2.status.busy },
-  running: { tone: "warning", label: SCREEN_2.status.busy },
-  succeeded: { tone: "success", label: SCREEN_2.status.done },
-  failed: { tone: "danger", label: SCREEN_2.status.failed },
+  queued: { tone: "warning", label: VARIATIONS_TEXT.status.busy },
+  running: { tone: "warning", label: VARIATIONS_TEXT.status.busy },
+  succeeded: { tone: "success", label: VARIATIONS_TEXT.status.done },
+  failed: { tone: "danger", label: VARIATIONS_TEXT.status.failed },
 };
 
 export interface VariantCardProps {
@@ -29,12 +29,14 @@ export function VariantCard({ item, onRetry }: VariantCardProps) {
         variant="tile"
         state={toMediaState(item)}
         statusLabel={
-          item.status === "failed" ? SCREEN_2.failedLabel : SCREEN_2.busyLabel
+          item.status === "failed"
+            ? VARIATIONS_TEXT.failedLabel
+            : VARIATIONS_TEXT.busyLabel
         }
       />
       <div className="flex items-center justify-between gap-2">
         <span className="text-badge text-text">
-          {SCREEN_2.variant(item.index)}
+          {VARIATIONS_TEXT.variant(item.index)}
         </span>
         <Badge tone={status.tone} size="sm">
           {status.label}
@@ -48,11 +50,11 @@ export function VariantCard({ item, onRetry }: VariantCardProps) {
             disabled={!item.error.retryable}
             onClick={onRetry}
           >
-            {SCREEN_2.retry}
+            {VARIATIONS_TEXT.retry}
           </Button>
           {item.error.retryable ? null : (
             <p className="text-badge-sm text-text-muted">
-              {SCREEN_2.reasons[item.error.kind]}
+              {VARIATIONS_TEXT.reasons[item.error.kind]}
             </p>
           )}
         </>
@@ -70,7 +72,7 @@ function toMediaState(item: ItemView): MediaState {
       return {
         kind: "image",
         src: item.imageUrl,
-        alt: SCREEN_2.imageAlt(item.index),
+        alt: VARIATIONS_TEXT.imageAlt(item.index),
       };
     case "failed":
       return { kind: "error" };

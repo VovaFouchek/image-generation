@@ -2,7 +2,7 @@ import "server-only";
 import { AppHeader, PageShell } from "@/ui";
 import { getRequestContext } from "../../server/context";
 import { getFormOptions } from "../../server/generation-service";
-import { SCREEN_1 } from "../copy";
+import { GENERATOR_TEXT } from "../../texts";
 import { GeneratorView } from "../generator-view";
 
 export interface GeneratorScreenProps {
@@ -17,8 +17,8 @@ export async function GeneratorScreen({
     <PageShell
       header={
         <AppHeader
-          title={SCREEN_1.header(options.brandName)}
-          meta={SCREEN_1.step}
+          title={GENERATOR_TEXT.header(options.brandName)}
+          meta={GENERATOR_TEXT.step}
         />
       }
     >
