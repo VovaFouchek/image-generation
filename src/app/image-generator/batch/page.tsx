@@ -1,10 +1,14 @@
-// Screen 2 (Figma frame 13:3): "Beeldbank — 15 variaties" with per-item status and retry.
-// TODO(next step): implement from Figma via get_design_context.
-export default function BatchPage() {
+import { Suspense } from "react";
+import { BatchScreen } from "@/features/image-generation/server";
+
+// Screen 2: 15 variations of the example passed as ?from=.
+export default function BatchPage(props: PageProps<"/image-generator/batch">) {
   return (
-    <main className="p-8">
-      <h1 className="text-xl font-semibold">Beeldbank — 15 variaties</h1>
-      <p className="text-sm text-neutral-500">UI not implemented yet.</p>
-    </main>
+    <Suspense>
+      <BatchScreen
+        searchParams={props.searchParams}
+        backPath="/image-generator"
+      />
+    </Suspense>
   );
 }
