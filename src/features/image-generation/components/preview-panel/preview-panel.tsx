@@ -33,7 +33,7 @@ export function PreviewPanel({ preview, continueHref }: PreviewPanelProps) {
       title={GENERATOR_TEXT.previewTitle}
       className="flex-1"
       aside={
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Badge role="status" tone={badge.tone}>
             {badge.label}
           </Badge>

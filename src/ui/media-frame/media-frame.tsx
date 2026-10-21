@@ -9,7 +9,8 @@ export type MediaState =
   | { kind: "error" };
 
 const VARIANTS = {
-  preview: "min-h-0 flex-1 rounded-button",
+  preview:
+    "min-h-0 flex-1 rounded-button max-lg:aspect-square max-lg:flex-none",
   tile: "aspect-tile w-full shrink-0",
 } as const;
 

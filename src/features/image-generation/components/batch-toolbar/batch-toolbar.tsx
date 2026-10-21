@@ -13,7 +13,7 @@ export function BatchToolbar({
   disabled,
 }: BatchToolbarProps) {
   return (
-    <div className="flex items-center justify-between gap-6">
+    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
       <div className="flex flex-col gap-1">
         <h2 className="text-title-lg text-text">{VARIATIONS_TEXT.title}</h2>
         <p className="text-caption text-text-muted">
