@@ -1,4 +1,4 @@
-// Option lists for the generation form (Figma frame 2:4).
+// Option lists for the generation form.
 // Values are stable identifiers stored with every generation; labels are UI-only.
 // Main colour swatches are not listed here: they come from the tenant's palette.
 

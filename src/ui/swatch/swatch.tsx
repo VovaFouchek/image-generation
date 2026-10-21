@@ -6,9 +6,7 @@ export type SwatchProps = Omit<
   ComponentProps<"button">,
   "role" | "children"
 > & {
-  /** Colour value from the tenant palette (data, not a design token). */
   hex: string;
-  /** Accessible colour name, e.g. "sage green". */
   name: string;
   selected: boolean;
 };

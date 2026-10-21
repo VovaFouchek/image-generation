@@ -4,11 +4,9 @@ import { VARIATIONS_TEXT } from "../../texts";
 
 export interface StatusSummaryProps {
   items: ItemView[];
-  /** Retries every failed item that is worth retrying. */
   onRetryFailed: () => void;
 }
 
-/** Counters computed from the real item statuses (Figma 13:14). */
 export function StatusSummary({ items, onRetryFailed }: StatusSummaryProps) {
   const done = items.filter((item) => item.status === "succeeded").length;
   const busy = items.filter(

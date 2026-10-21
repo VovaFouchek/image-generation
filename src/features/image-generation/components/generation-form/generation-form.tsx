@@ -29,7 +29,6 @@ export interface GenerationFormProps {
   onSubmit: () => void;
 }
 
-/** The form panel of screen 1 (Figma 2:9). State lives in useGenerationForm. */
 export function GenerationForm({
   options,
   values,

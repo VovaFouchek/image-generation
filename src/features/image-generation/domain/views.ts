@@ -53,6 +53,5 @@ export interface FormOptionsView {
   pages: { id: string; url: string }[];
   segments: { id: string; label: string }[];
   palette: { id: string; name: string; hex: string }[];
-  /** First palette colour (white in the demo): no accent, as pre-selected in Figma. */
   defaultMainColorId: string;
 }

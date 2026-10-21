@@ -4,8 +4,6 @@ import type { GenerationRequest } from "../domain/request";
 import type { ComposedPrompt } from "../prompt/compose-prompt";
 import type { GeneratedImage, ProviderConfig } from "../providers/types";
 
-// A single generation is a batch of one, so both Figma screens share one pipeline.
-
 export { ITEM_LEASE_MS } from "../domain/lease";
 
 export type BatchKind = "single" | "variations";

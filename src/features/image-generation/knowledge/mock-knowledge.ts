@@ -64,7 +64,6 @@ const TENANTS: Record<string, TenantKnowledge> = {
       defaultPlacement:
         "The produce crate sits in the right third, leaving a calm, uncluttered area on the left",
     },
-    // Matches the existing Figma swatches.
     palette: [
       { id: "white", name: "white", hex: "#FFFFFF" },
       { id: "charcoal", name: "charcoal black", hex: "#212126" },
