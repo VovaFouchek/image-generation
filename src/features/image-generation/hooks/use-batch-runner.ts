@@ -8,6 +8,9 @@ import type { BatchView, ItemView } from "../domain/views";
 const POLL_INTERVAL_MS = 3_000;
 const POLL_TIMEOUT_MS = 130_000;
 
+/** One period while the page is mounted and visible; runs started in it stop when it ends. */
+type Session = symbol;
+
 export interface BatchRunnerOptions {
   sourceBatchId: string;
   concurrency: number;
@@ -19,6 +22,10 @@ export interface BatchRunnerOptions {
  * Screen 2: creates the variations batch and runs its items with limited parallelism.
  * Only the batch on screen is run or updated; results for an older batch are ignored.
  * The batch id goes into the URL, so a reload restores it instead of paying again.
+ *
+ * Next.js hides pages with <Activity> on navigation instead of unmounting them, which runs
+ * effect cleanups. Hiding ends the session (no new runs, results ignored); showing the page
+ * again starts a new one that continues the current batch.
  */
 export function useBatchRunner({
   sourceBatchId,
@@ -28,25 +35,33 @@ export function useBatchRunner({
   const [batch, setBatch] = useState<BatchView | null>(initialBatch);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const activeBatchId = useRef<string | null>(null);
-  const resumed = useRef(false);
+  const session = useRef<Session | null>(null);
+  const latestBatch = useRef(initialBatch);
 
-  function updateItem(batchId: string, item: ItemView) {
-    if (activeBatchId.current !== batchId) return;
-    setBatch((current) =>
-      current?.id === batchId
+  useEffect(() => {
+    latestBatch.current = batch;
+  }, [batch]);
+
+  function isLive(current: Session) {
+    return session.current === current;
+  }
+
+  function updateItem(current: Session, batchId: string, item: ItemView) {
+    if (!isLive(current)) return;
+    setBatch((shown) =>
+      shown?.id === batchId
         ? {
-            ...current,
-            items: current.items.map((existing) =>
+            ...shown,
+            items: shown.items.map((existing) =>
               existing.id === item.id ? item : existing,
             ),
           }
-        : current,
+        : shown,
     );
   }
 
-  async function runOne(batchId: string, item: ItemView) {
-    updateItem(batchId, {
+  async function runOne(current: Session, batchId: string, item: ItemView) {
+    updateItem(current, batchId, {
       id: item.id,
       index: item.index,
       attempts: item.attempts,
@@ -54,13 +69,13 @@ export function useBatchRunner({
     });
     try {
       const result = await runItem(batchId, item.id);
-      updateItem(batchId, result);
-
+      updateItem(current, batchId, result);
+      // Another request (e.g. the page before a reload) already claimed it: follow it to the end.
       if (result.status === "running") {
-        await pollRunning(batchId, [item.id]);
+        await pollRunning(current, batchId, [item.id]);
       }
     } catch {
-      updateItem(batchId, {
+      updateItem(current, batchId, {
         id: item.id,
         index: item.index,
         attempts: item.attempts,
@@ -74,65 +89,70 @@ export function useBatchRunner({
     }
   }
 
-  async function runAll(target: BatchView, items: ItemView[]) {
+  async function runAll(
+    current: Session,
+    target: BatchView,
+    items: ItemView[],
+  ) {
     let next = 0;
     const workers = Array.from(
       { length: Math.min(concurrency, items.length) },
       async () => {
-        while (next < items.length && activeBatchId.current === target.id) {
+        while (next < items.length && isLive(current)) {
           const item = items[next++];
-          if (item) await runOne(target.id, item);
+          if (item) await runOne(current, target.id, item);
         }
       },
     );
     await Promise.all(workers);
   }
 
-  /** Follows items another page load started until the server settles them. */
-  async function pollRunning(batchId: string, itemIds: string[]) {
+  /** Follows items started elsewhere (another page load or session) until the server settles them. */
+  async function pollRunning(
+    current: Session,
+    batchId: string,
+    itemIds: string[],
+  ) {
     const watching = new Set(itemIds);
     const deadline = Date.now() + POLL_TIMEOUT_MS;
-    while (
-      watching.size > 0 &&
-      activeBatchId.current === batchId &&
-      Date.now() < deadline
-    ) {
+    while (watching.size > 0 && isLive(current) && Date.now() < deadline) {
       await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
       const fresh = await getBatch(batchId).catch(() => null);
       for (const item of fresh?.items ?? []) {
         if (watching.has(item.id) && item.status !== "running") {
           watching.delete(item.id);
-          updateItem(batchId, item);
+          updateItem(current, batchId, item);
         }
       }
     }
   }
 
-  async function resume(restored: BatchView) {
-    const queued = restored.items.filter((item) => item.status === "queued");
-    const running = restored.items.flatMap((item) =>
+  async function resume(current: Session, target: BatchView) {
+    const queued = target.items.filter((item) => item.status === "queued");
+    const running = target.items.flatMap((item) =>
       item.status === "running" ? [item.id] : [],
     );
     await Promise.all([
-      runAll(restored, queued),
-      pollRunning(restored.id, running),
+      runAll(current, target, queued),
+      pollRunning(current, target.id, running),
     ]);
   }
 
   useEffect(() => {
-    activeBatchId.current = initialBatch?.id ?? null;
-    if (initialBatch && !resumed.current) {
-      resumed.current = true;
-      void resume(initialBatch);
-    }
+    const current: Session = Symbol("batch-runner-session");
+    session.current = current;
+    // First mount (incl. a batch restored from the URL) or the page shown again: carry on.
+    if (latestBatch.current) void resume(current, latestBatch.current);
     return () => {
-      activeBatchId.current = null; // stop applying results after leaving the page
+      session.current = null; // hidden or left: stop starting runs and applying results
     };
-    // Runs once per restored batch; the runner functions read refs, not render state.
+    // Runs once per mount/show; the runner reads the current batch from a ref.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialBatch]);
+  }, []);
 
   async function generate() {
+    const current = session.current;
+    if (!current) return;
     setCreating(true);
     setError(null);
     try {
@@ -140,13 +160,12 @@ export function useBatchRunner({
         kind: "variations",
         from: sourceBatchId,
       });
-      activeBatchId.current = created.id;
       setBatch(created);
       setCreating(false);
       const params = new URLSearchParams(window.location.search);
       params.set("batch", created.id);
       window.history.replaceState(null, "", `?${params.toString()}`);
-      await runAll(created, created.items);
+      await runAll(current, created, created.items);
     } catch {
       setCreating(false);
       setError(VARIATIONS_TEXT.network);
@@ -154,14 +173,15 @@ export function useBatchRunner({
   }
 
   function retry(itemIds: string[]) {
-    if (!batch) return;
+    const current = session.current;
+    if (!current || !batch) return;
     const items = batch.items.filter(
       (item) =>
         itemIds.includes(item.id) &&
         item.status === "failed" &&
         item.error.retryable,
     );
-    void runAll(batch, items);
+    void runAll(current, batch, items);
   }
 
   const busy =
