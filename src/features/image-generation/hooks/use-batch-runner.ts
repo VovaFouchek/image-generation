@@ -53,7 +53,12 @@ export function useBatchRunner({
       status: "running",
     });
     try {
-      updateItem(batchId, await runItem(batchId, item.id));
+      const result = await runItem(batchId, item.id);
+      updateItem(batchId, result);
+
+      if (result.status === "running") {
+        await pollRunning(batchId, [item.id]);
+      }
     } catch {
       updateItem(batchId, {
         id: item.id,
