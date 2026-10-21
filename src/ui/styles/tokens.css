@@ -26,44 +26,45 @@
   --color-danger: #bf261a;
   --color-danger-tile: #faf0ed;
 
-  /* Typography: Inter, line-height normal everywhere in the design */
+  /* Typography: Inter. Figma uses leading "normal"; line heights are the text box heights
+     Figma rendered (from node metadata), so metrics do not depend on the browser's font metrics. */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --text-title-lg: 22px;
-  --text-title-lg--line-height: normal;
+  --text-title-lg--line-height: 27px;
   --text-title-lg--font-weight: 600;
   --text-title: 20px;
-  --text-title--line-height: normal;
+  --text-title--line-height: 24px;
   --text-title--font-weight: 600;
   --text-app-title: 18px;
-  --text-app-title--line-height: normal;
+  --text-app-title--line-height: 22px;
   --text-app-title--font-weight: 600;
   --text-button-lg: 15px;
-  --text-button-lg--line-height: normal;
+  --text-button-lg--line-height: 18px;
   --text-button-lg--font-weight: 600;
   --text-body: 14px;
-  --text-body--line-height: normal;
+  --text-body--line-height: 17px;
   --text-body--font-weight: 400;
   --text-button: 14px;
-  --text-button--line-height: normal;
+  --text-button--line-height: 17px;
   --text-button--font-weight: 600;
   --text-label: 13px;
-  --text-label--line-height: normal;
+  --text-label--line-height: 16px;
   --text-label--font-weight: 500;
   --text-caption: 13px;
-  --text-caption--line-height: normal;
+  --text-caption--line-height: 16px;
   --text-caption--font-weight: 400;
   --text-badge: 12px;
-  --text-badge--line-height: normal;
+  --text-badge--line-height: 15px;
   --text-badge--font-weight: 500;
   --text-badge-strong: 12px;
-  --text-badge-strong--line-height: normal;
+  --text-badge-strong--line-height: 15px;
   --text-badge-strong--font-weight: 600;
   --text-button-sm: 11px;
-  --text-button-sm--line-height: normal;
+  --text-button-sm--line-height: 13px;
   --text-button-sm--font-weight: 500;
   --text-badge-sm: 10px;
-  --text-badge-sm--line-height: normal;
+  --text-badge-sm--line-height: 12px;
   --text-badge-sm--font-weight: 600;
   /* Glyph icons (placeholders until SVGs are exported from Figma) */
   --text-icon: 22px;
