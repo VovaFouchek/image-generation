@@ -15,7 +15,12 @@ import type {
 } from "../providers/types";
 import { MemoryGenerationRepository } from "../repository/memory-repository";
 import type { GenerationBatch } from "../repository/types";
-import { cargoRequest, mortgageRequest } from "../test-fixtures";
+import {
+  demoTenant,
+  freshRequest,
+  travelRequest,
+  withNoPeopleRule,
+} from "../test-fixtures";
 import type { RequestContext } from "./context";
 import {
   createSingleBatch,
@@ -79,7 +84,7 @@ function onlyItem(batch: GenerationBatch) {
 }
 
 async function succeededSingle(ctx: RequestContext) {
-  const batch = await createSingleBatch(ctx, cargoRequest());
+  const batch = await createSingleBatch(ctx, freshRequest());
   await runItem(ctx, batch.id, onlyItem(batch).id);
   return batch;
 }
@@ -88,17 +93,21 @@ describe("generation service", () => {
   it("rejects a rule conflict before storing anything or calling the provider", async () => {
     const provider = scriptedProvider([]);
     const repository = new MemoryGenerationRepository();
-    const ctx = context("demo-mortgage", provider, repository);
+    const ctx = context("demo-travel", provider, repository);
+    ctx.knowledge = {
+      ...mockKnowledgeSource,
+      getTenant: async (tenantId) => withNoPeopleRule(demoTenant(tenantId)),
+    };
 
     await expect(
-      createSingleBatch(ctx, mortgageRequest({ brandSegmentId: "starters" })),
+      createSingleBatch(ctx, travelRequest({ brandSegmentId: "families" })),
     ).rejects.toBeInstanceOf(BriefConflictError);
     expect(provider.calls).toHaveLength(0);
   });
 
   it("snapshots the provider config on every planned item", async () => {
-    const ctx = context("demo-cargo", scriptedProvider([]));
-    const batch = await createSingleBatch(ctx, cargoRequest());
+    const ctx = context("demo-fresh", scriptedProvider([]));
+    const batch = await createSingleBatch(ctx, freshRequest());
     expect(onlyItem(batch).config).toEqual({
       provider: "fake",
       model: "fake",
@@ -110,7 +119,7 @@ describe("generation service", () => {
 
   describe("variations", () => {
     it("reuse the example's request and brief for 15 items", async () => {
-      const ctx = context("demo-cargo", scriptedProvider([]));
+      const ctx = context("demo-fresh", scriptedProvider([]));
       const single = await succeededSingle(ctx);
       const batch = await createVariationsBatch(ctx, single.id);
 
@@ -122,22 +131,18 @@ describe("generation service", () => {
 
     it("cannot start from another tenant's batch", async () => {
       const repository = new MemoryGenerationRepository();
-      const cargo = context("demo-cargo", scriptedProvider([]), repository);
-      const mortgage = context(
-        "demo-mortgage",
-        scriptedProvider([]),
-        repository,
-      );
-      const single = await succeededSingle(cargo);
+      const fresh = context("demo-fresh", scriptedProvider([]), repository);
+      const travel = context("demo-travel", scriptedProvider([]), repository);
+      const single = await succeededSingle(fresh);
 
       await expect(
-        createVariationsBatch(mortgage, single.id),
+        createVariationsBatch(travel, single.id),
       ).rejects.toBeInstanceOf(NotFoundError);
     });
 
     it("need a successful example first", async () => {
-      const ctx = context("demo-cargo", scriptedProvider(["safety"]));
-      const single = await createSingleBatch(ctx, cargoRequest());
+      const ctx = context("demo-fresh", scriptedProvider(["safety"]));
+      const single = await createSingleBatch(ctx, freshRequest());
       await expect(
         createVariationsBatch(ctx, single.id),
       ).rejects.toBeInstanceOf(InvalidSourceBatchError);
@@ -149,7 +154,7 @@ describe("generation service", () => {
     });
 
     it("cannot start from another variations batch", async () => {
-      const ctx = context("demo-cargo", scriptedProvider([]));
+      const ctx = context("demo-fresh", scriptedProvider([]));
       const variations = await createVariationsBatch(
         ctx,
         (await succeededSingle(ctx)).id,
@@ -162,9 +167,9 @@ describe("generation service", () => {
 
   describe("runItem", () => {
     it("rejects an item that does not belong to the batch", async () => {
-      const ctx = context("demo-cargo", scriptedProvider([]));
-      const a = await createSingleBatch(ctx, cargoRequest());
-      const b = await createSingleBatch(ctx, cargoRequest());
+      const ctx = context("demo-fresh", scriptedProvider([]));
+      const a = await createSingleBatch(ctx, freshRequest());
+      const b = await createSingleBatch(ctx, freshRequest());
       await expect(runItem(ctx, b.id, onlyItem(a).id)).rejects.toBeInstanceOf(
         NotFoundError,
       );
@@ -172,8 +177,8 @@ describe("generation service", () => {
 
     it("retries a transient error once automatically", async () => {
       const provider = scriptedProvider(["transient", "ok"]);
-      const ctx = context("demo-cargo", provider);
-      const batch = await createSingleBatch(ctx, cargoRequest());
+      const ctx = context("demo-fresh", provider);
+      const batch = await createSingleBatch(ctx, freshRequest());
       const item = await runItem(ctx, batch.id, onlyItem(batch).id);
 
       expect(item).toMatchObject({ status: "succeeded", attempts: 1 });
@@ -182,8 +187,8 @@ describe("generation service", () => {
 
     it("fails after the automatic retry and succeeds on a manual retry", async () => {
       const provider = scriptedProvider(["transient", "transient", "ok"]);
-      const ctx = context("demo-cargo", provider);
-      const batch = await createSingleBatch(ctx, cargoRequest());
+      const ctx = context("demo-fresh", provider);
+      const batch = await createSingleBatch(ctx, freshRequest());
       const { id } = onlyItem(batch);
 
       expect(await runItem(ctx, batch.id, id)).toMatchObject({
@@ -200,8 +205,8 @@ describe("generation service", () => {
       "does not retry a %s error",
       async (kind) => {
         const provider = scriptedProvider([kind]);
-        const ctx = context("demo-cargo", provider);
-        const batch = await createSingleBatch(ctx, cargoRequest());
+        const ctx = context("demo-fresh", provider);
+        const batch = await createSingleBatch(ctx, freshRequest());
         const item = await runItem(ctx, batch.id, onlyItem(batch).id);
 
         expect(item).toMatchObject({
@@ -214,8 +219,8 @@ describe("generation service", () => {
 
     it("aborts a hung provider call within the time budget", async () => {
       const provider = scriptedProvider(["hang"]);
-      const ctx = context("demo-cargo", provider);
-      const batch = await createSingleBatch(ctx, cargoRequest());
+      const ctx = context("demo-fresh", provider);
+      const batch = await createSingleBatch(ctx, freshRequest());
       const item = await runItem(ctx, batch.id, onlyItem(batch).id, {
         budgetMs: 20,
       });
@@ -230,8 +235,8 @@ describe("generation service", () => {
 
     it("passes the item's snapshot and prompt to the provider", async () => {
       const provider = scriptedProvider(["ok"]);
-      const ctx = context("demo-cargo", provider);
-      const batch = await createSingleBatch(ctx, cargoRequest());
+      const ctx = context("demo-fresh", provider);
+      const batch = await createSingleBatch(ctx, freshRequest());
       const item = onlyItem(batch);
       await runItem(ctx, batch.id, item.id);
 
@@ -246,8 +251,8 @@ describe("generation service", () => {
   });
 
   it("records token usage and call duration on a succeeded item", async () => {
-    const ctx = context("demo-cargo", scriptedProvider(["ok"]));
-    const batch = await createSingleBatch(ctx, cargoRequest());
+    const ctx = context("demo-fresh", scriptedProvider(["ok"]));
+    const batch = await createSingleBatch(ctx, freshRequest());
     const item = await runItem(ctx, batch.id, onlyItem(batch).id);
 
     expect(item.status).toBe("succeeded");
@@ -262,7 +267,7 @@ describe("generation service", () => {
 
   it("plans variations with the example's provider snapshot, not the current env", async () => {
     const repository = new MemoryGenerationRepository();
-    const before = context("demo-cargo", scriptedProvider([]), repository);
+    const before = context("demo-fresh", scriptedProvider([]), repository);
     const single = await succeededSingle(before);
 
     const after: RequestContext = {

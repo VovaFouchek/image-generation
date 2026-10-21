@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { buildBrief } from "../brief/build-brief";
 import { BATCH_SIZE } from "../domain/options";
 import { GLOBAL_KNOWLEDGE } from "../knowledge/mock-knowledge";
-import { cargoRequest, demoTenant } from "../test-fixtures";
+import { freshRequest, demoTenant } from "../test-fixtures";
 import { planVariations } from "./variation-plan";
 
 const brief = buildBrief(
   GLOBAL_KNOWLEDGE,
-  demoTenant("demo-cargo"),
-  cargoRequest(),
+  demoTenant("demo-fresh"),
+  freshRequest(),
 );
 
 describe("planVariations", () => {

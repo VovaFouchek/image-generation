@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildBrief } from "../brief/build-brief";
 import { GLOBAL_KNOWLEDGE } from "../knowledge/mock-knowledge";
-import { cargoRequest, demoTenant } from "../test-fixtures";
+import { freshRequest, demoTenant } from "../test-fixtures";
 import { MemoryGenerationRepository } from "./memory-repository";
 import type { GenerationBatch, NewBatch } from "./types";
 
-const request = cargoRequest();
-const brief = buildBrief(GLOBAL_KNOWLEDGE, demoTenant("demo-cargo"), request);
+const request = freshRequest();
+const brief = buildBrief(GLOBAL_KNOWLEDGE, demoTenant("demo-fresh"), request);
 
 function newBatch(tenantId: string): NewBatch {
   return {

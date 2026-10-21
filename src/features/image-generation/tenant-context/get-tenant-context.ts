@@ -16,8 +16,16 @@ export interface TenantContext {
  */
 export async function getTenantContext(): Promise<TenantContext> {
   const store = await cookies();
+  const demoTenantId = store.get("demo-tenant")?.value ?? DEFAULT_TENANT_ID;
+  // Keep existing local demo cookies working after replacing the sample businesses.
+  const tenantId =
+    demoTenantId === "demo-cargo"
+      ? "demo-fresh"
+      : demoTenantId === "demo-mortgage"
+        ? "demo-travel"
+        : demoTenantId;
   return {
-    tenantId: store.get("demo-tenant")?.value ?? DEFAULT_TENANT_ID,
+    tenantId,
     userId: "demo-user",
     role: "user",
   };

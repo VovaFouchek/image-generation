@@ -5,7 +5,7 @@ import { toItemView } from "./views";
 const failed: GenerationItem = {
   id: "item-1",
   batchId: "batch-1",
-  tenantId: "demo-cargo",
+  tenantId: "demo-fresh",
   index: 0,
   variation: {
     index: 0,
