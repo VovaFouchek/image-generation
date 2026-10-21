@@ -26,8 +26,7 @@
   --color-danger: #bf261a;
   --color-danger-tile: #faf0ed;
 
-  /* Typography: Inter. Figma uses leading "normal"; line heights are the text box heights
-     Figma rendered (from node metadata), so metrics do not depend on the browser's font metrics. */
+  /* Typography: Inter.  */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --text-title-lg: 22px;
@@ -82,6 +81,8 @@
 
   /* Layout sizes (the spacing scale itself is Tailwind's 4px grid: 2.5 = 10px, 3.5 = 14px, 7 = 28px) */
   --container-form-panel: 420px;
+  /* Variant tile: 237.2×140 in Figma (node 13:3); keeps the ratio when the grid column grows */
+  --aspect-tile: 237.2 / 140;
 }
 
 /* Empty preview frame: 1.5px dashed border (Figma node 3:55) */

@@ -10,7 +10,7 @@ export type MediaState =
 
 const VARIANTS = {
   preview: "min-h-0 flex-1 rounded-button",
-  tile: "h-35 w-full shrink-0",
+  tile: "aspect-tile w-full shrink-0",
 } as const;
 
 const STATE_SURFACES = {
