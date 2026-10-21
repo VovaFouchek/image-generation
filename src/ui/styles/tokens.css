@@ -1,0 +1,89 @@
+/*
+ * Design tokens extracted from Figma (file 36WaOMfQdo4LrO8Rt2Yf6B, nodes 2:4 and 13:3).
+ * Figma has no variables or styles, so names are ours; values are the design's raw values.
+ * Components use only these semantic utilities (bg-surface, text-title, rounded-control, …).
+ * Light theme only: the design has no dark variant.
+ */
+@theme {
+  /* Colours */
+  --color-canvas: #f5f5f7;
+  --color-surface: #ffffff;
+  --color-border: #dedee3;
+  --color-border-input: #d9d9de;
+  --color-field: #f7f7fa;
+  --color-text: #1a1a1f;
+  --color-text-muted: #737380;
+  --color-accent: #1717d9;
+  --color-accent-foreground: #ffffff;
+  --color-neutral-soft: #f0f0f5;
+  --color-placeholder: #e5e8f0;
+  --color-placeholder-border: #ccccd4;
+  --color-success-soft: #dbf0de;
+  --color-success: #218033;
+  --color-warning-soft: #fff2cc;
+  --color-warning: #997300;
+  --color-danger-soft: #ffe0de;
+  --color-danger: #bf261a;
+  --color-danger-tile: #faf0ed;
+
+  /* Typography: Inter, line-height normal everywhere in the design */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --text-title-lg: 22px;
+  --text-title-lg--line-height: normal;
+  --text-title-lg--font-weight: 600;
+  --text-title: 20px;
+  --text-title--line-height: normal;
+  --text-title--font-weight: 600;
+  --text-app-title: 18px;
+  --text-app-title--line-height: normal;
+  --text-app-title--font-weight: 600;
+  --text-button-lg: 15px;
+  --text-button-lg--line-height: normal;
+  --text-button-lg--font-weight: 600;
+  --text-body: 14px;
+  --text-body--line-height: normal;
+  --text-body--font-weight: 400;
+  --text-button: 14px;
+  --text-button--line-height: normal;
+  --text-button--font-weight: 600;
+  --text-label: 13px;
+  --text-label--line-height: normal;
+  --text-label--font-weight: 500;
+  --text-caption: 13px;
+  --text-caption--line-height: normal;
+  --text-caption--font-weight: 400;
+  --text-badge: 12px;
+  --text-badge--line-height: normal;
+  --text-badge--font-weight: 500;
+  --text-badge-strong: 12px;
+  --text-badge-strong--line-height: normal;
+  --text-badge-strong--font-weight: 600;
+  --text-button-sm: 11px;
+  --text-button-sm--line-height: normal;
+  --text-button-sm--font-weight: 500;
+  --text-badge-sm: 10px;
+  --text-badge-sm--line-height: normal;
+  --text-badge-sm--font-weight: 600;
+  /* Glyph icons (placeholders until SVGs are exported from Figma) */
+  --text-icon: 22px;
+  --text-icon--line-height: normal;
+  --text-icon-lg: 32px;
+  --text-icon-lg--line-height: normal;
+
+  /* Radii */
+  --radius-button-sm: 6px;
+  --radius-control: 8px;
+  --radius-button: 10px;
+  --radius-panel: 12px;
+  --radius-badge: 12px;
+  --radius-pill: 20px;
+
+  /* Layout sizes (the spacing scale itself is Tailwind's 4px grid: 2.5 = 10px, 3.5 = 14px, 7 = 28px) */
+  --container-form-panel: 420px;
+}
+
+/* Empty preview frame: 1.5px dashed border (Figma node 3:55) */
+@utility border-placeholder-dashed {
+  border: 1.5px dashed var(--color-placeholder-border);
+}

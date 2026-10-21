@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "../ui/styles/tokens.css";
+
+@layer base {
+  body {
+    @apply bg-canvas font-sans text-text antialiased;
+  }
+}
