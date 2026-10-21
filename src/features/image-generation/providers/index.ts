@@ -10,7 +10,8 @@ const providers = new Map<string, ImageProvider>();
 
 /**
  * Resolves the provider named in an item's config snapshot, not the current env choice, so a
- * retry after an env switch still runs on the provider the item was planned for.
+ * permitted run uses the provider the item was planned for. The service checks the current
+ * server policy before resolving it; a snapshot cannot authorise a revoked provider.
  */
 export function resolveImageProvider(name: string): ImageProvider {
   const cached = providers.get(name);

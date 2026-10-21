@@ -2,7 +2,8 @@ import "server-only";
 import { z } from "zod";
 import { IMAGE_SIZES, THINKING_LEVELS } from "../providers/types";
 
-// The only module in the feature that reads process.env.
+// The only module in the feature that reads process.env. Supabase and the demo sign-in belong
+// to the host (src/lib/env.ts).
 const envSchema = z.object({
   IMAGE_PROVIDER: z.enum(["mock", "gemini"]).default("mock"),
   GEMINI_API_KEY: z.string().optional(),
@@ -11,9 +12,9 @@ const envSchema = z.object({
   GEMINI_THINKING_LEVEL: z.enum(THINKING_LEVELS).default("medium"),
   // Mock only: share of items whose first attempt fails, to exercise retry UI (0–1).
   MOCK_FAILURE_RATE: z.coerce.number().min(0).max(1).default(0),
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
-  SUPABASE_SECRET_KEY: z.string().optional(),
   BATCH_CONCURRENCY: z.coerce.number().int().min(1).max(10).default(3),
+  // Generation attempts per tenant per 24 hours; protects the provider budget (DD13).
+  DAILY_ATTEMPT_LIMIT: z.coerce.number().int().min(1).default(100),
 });
 
 export type ServerConfig = z.infer<typeof envSchema>;

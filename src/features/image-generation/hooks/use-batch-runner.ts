@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createBatch, getBatch, runItem } from "../client/api";
+import { ApiError, createBatch, getBatch, runItem } from "../client/api";
+import { ITEM_LEASE_MS } from "../domain/lease";
 import { VARIATIONS_TEXT } from "../texts";
 import type { BatchView, ItemView } from "../domain/views";
 
 const POLL_INTERVAL_MS = 3_000;
-const POLL_TIMEOUT_MS = 130_000;
+// Past the lease the server reports a dead run as a retryable failure, so poll beyond it.
+const POLL_TIMEOUT_MS = ITEM_LEASE_MS + 30_000;
 
 /** One period while the page is mounted and visible; runs started in it stop when it ends. */
 type Session = symbol;
@@ -74,17 +76,25 @@ export function useBatchRunner({
       if (result.status === "running") {
         await pollRunning(current, batchId, [item.id]);
       }
-    } catch {
+    } catch (error) {
+      // 429: the tenant's daily limit is reached; retrying now would only hit it again.
+      const limited = error instanceof ApiError && error.status === 429;
       updateItem(current, batchId, {
         id: item.id,
         index: item.index,
         attempts: item.attempts,
         status: "failed",
-        error: {
-          kind: "transient",
-          message: VARIATIONS_TEXT.network,
-          retryable: true,
-        },
+        error: limited
+          ? {
+              kind: "billing",
+              message: VARIATIONS_TEXT.reasons.billing,
+              retryable: false,
+            }
+          : {
+              kind: "transient",
+              message: VARIATIONS_TEXT.network,
+              retryable: true,
+            },
       });
     }
   }

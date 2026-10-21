@@ -9,7 +9,8 @@ export type ThinkingLevel = (typeof THINKING_LEVELS)[number];
 
 /**
  * Everything that shapes the provider call, snapshotted on each item when the batch is
- * planned. Retries use the snapshot, never the current env, so a generation can be reproduced.
+ * planned. Retries use this snapshot only while the current server policy still permits it;
+ * revoked settings fail rather than being silently replaced with the current configuration.
  * No seed or temperature: Nano Banana 2.1 rejects them.
  */
 export interface ProviderConfig {

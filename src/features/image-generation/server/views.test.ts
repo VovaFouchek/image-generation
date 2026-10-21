@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { GenerationItem } from "../repository/types";
+import { ITEM_LEASE_MS, type GenerationItem } from "../repository/types";
 import { toItemView } from "./views";
 
 const failed: GenerationItem = {
@@ -53,5 +53,20 @@ describe("toItemView", () => {
   it("never exposes prompts or provider config", () => {
     const json = JSON.stringify(toItemView(failed));
     expect(json).not.toMatch(/secret|ai\.studio|prepayment|gemini/);
+  });
+
+  it("shows a run past its lease as a retryable failure", () => {
+    const running: GenerationItem = {
+      ...failed,
+      status: "running",
+      runningSince: "2026-10-21T12:00:00.000Z",
+    };
+    const start = Date.parse(running.runningSince);
+
+    expect(toItemView(running, start + ITEM_LEASE_MS).status).toBe("running");
+    expect(toItemView(running, start + ITEM_LEASE_MS + 1)).toMatchObject({
+      status: "failed",
+      error: { kind: "transient", retryable: true },
+    });
   });
 });

@@ -1,9 +1,12 @@
 import "server-only";
 import { z } from "zod";
+import { TenantMembershipError } from "@/lib/supabase/session";
 import {
   BriefConflictError,
+  DailyLimitError,
   InvalidSourceBatchError,
   NotFoundError,
+  UnauthorizedError,
   UnknownReferenceError,
 } from "../domain/errors";
 
@@ -31,6 +34,24 @@ export function toErrorResponse(error: unknown) {
     return Response.json(
       { error: error.code, message: error.message },
       { status: 409 },
+    );
+  }
+  if (error instanceof UnauthorizedError) {
+    return Response.json(
+      { error: error.code, message: error.message },
+      { status: 401 },
+    );
+  }
+  if (error instanceof TenantMembershipError) {
+    return Response.json(
+      { error: error.code, message: error.message },
+      { status: 403 },
+    );
+  }
+  if (error instanceof DailyLimitError) {
+    return Response.json(
+      { error: error.code, message: error.message },
+      { status: 429 },
     );
   }
   if (error instanceof NotFoundError) {

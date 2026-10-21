@@ -2,7 +2,11 @@ import "server-only";
 import { API_BASE } from "../domain/api";
 import type { ProviderErrorKind } from "../domain/errors";
 import type { BatchView, ItemView } from "../domain/views";
-import type { GenerationBatch, GenerationItem } from "../repository/types";
+import {
+  ITEM_LEASE_MS,
+  type GenerationBatch,
+  type GenerationItem,
+} from "../repository/types";
 
 /**
  * What a client user may see. Raw provider messages (billing details, console URLs) stay in
@@ -16,12 +20,30 @@ const PUBLIC_ERROR_MESSAGES: Record<ProviderErrorKind, string> = {
   invalid: "Image generation is not set up correctly.",
 };
 
-export function toItemView(item: GenerationItem): ItemView {
+export function publicErrorMessage(kind: ProviderErrorKind) {
+  return PUBLIC_ERROR_MESSAGES[kind];
+}
+
+export function toItemView(item: GenerationItem, now = Date.now()): ItemView {
   const base = { id: item.id, index: item.index, attempts: item.attempts };
   switch (item.status) {
     case "queued":
+      return { ...base, status: "queued" };
     case "running":
-      return { ...base, status: item.status };
+      // DD5: a run past its lease died with its function. Show it as a retryable failure; a
+      // retry claims it again, which the lease allows.
+      if (now - Date.parse(item.runningSince) > ITEM_LEASE_MS) {
+        return {
+          ...base,
+          status: "failed",
+          error: {
+            kind: "transient",
+            retryable: true,
+            message: PUBLIC_ERROR_MESSAGES.transient,
+          },
+        };
+      }
+      return { ...base, status: "running" };
     case "succeeded":
       return {
         ...base,
@@ -41,13 +63,16 @@ export function toItemView(item: GenerationItem): ItemView {
   }
 }
 
-export function toBatchView(batch: GenerationBatch): BatchView {
+export function toBatchView(
+  batch: GenerationBatch,
+  now = Date.now(),
+): BatchView {
   return {
     id: batch.id,
     kind: batch.kind,
     sourceBatchId: batch.sourceBatchId,
     aspectRatio: batch.brief.format.aspectRatio,
     createdAt: batch.createdAt,
-    items: batch.items.map(toItemView),
+    items: batch.items.map((item) => toItemView(item, now)),
   };
 }

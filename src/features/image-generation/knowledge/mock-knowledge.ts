@@ -269,8 +269,6 @@ const TENANTS: Record<string, TenantKnowledge> = {
   },
 };
 
-export const DEFAULT_TENANT_ID = "demo-fresh";
-
 export function findTenantKnowledge(
   tenantId: string,
 ): TenantKnowledge | undefined {

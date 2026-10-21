@@ -31,12 +31,28 @@ export class NotFoundError extends Error {
   readonly code = "not_found";
 }
 
+/** No signed-in user: the host must establish a session first. */
+export class UnauthorizedError extends Error {
+  readonly code = "unauthorized";
+}
+
+/** The tenant used up its daily generation attempts (DD13): protects the provider budget. */
+export class DailyLimitError extends Error {
+  readonly code = "daily_limit_reached";
+}
+
 /**
  * rate_limit / transient: worth one automatic retry (D8).
  * billing / safety / invalid: retrying the same request will not help; show the reason.
  */
-export type ProviderErrorKind =
-  "rate_limit" | "transient" | "billing" | "safety" | "invalid";
+export const PROVIDER_ERROR_KINDS = [
+  "rate_limit",
+  "transient",
+  "billing",
+  "safety",
+  "invalid",
+] as const;
+export type ProviderErrorKind = (typeof PROVIDER_ERROR_KINDS)[number];
 
 export class ProviderError extends Error {
   readonly code = "provider_error";

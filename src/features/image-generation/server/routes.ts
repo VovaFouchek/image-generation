@@ -71,7 +71,13 @@ export async function getImageRoute(
     return new Response(Buffer.from(image.data), {
       headers: {
         "Content-Type": image.mimeType,
-        "Cache-Control": "private, max-age=3600",
+        // A succeeded item's image never changes.
+        "Cache-Control": "private, max-age=31536000, immutable",
+        // Files come from Storage, which tenant members can write to: never let one run code
+        // (e.g. a script inside an SVG) or be sniffed as another type.
+        "Content-Security-Policy":
+          "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error) {

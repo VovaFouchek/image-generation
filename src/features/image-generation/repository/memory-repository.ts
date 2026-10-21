@@ -1,19 +1,19 @@
-import type {
-  CompletedResult,
-  GenerationBatch,
-  GenerationItem,
-  GenerationRepository,
-  ItemError,
-  NewBatch,
-  RunningItem,
-  StoredImage,
+import {
+  ITEM_LEASE_MS,
+  type CompletedResult,
+  type GenerationBatch,
+  type GenerationItem,
+  type GenerationRepository,
+  type ItemError,
+  type NewBatch,
+  type RunningItem,
+  type StoredImage,
 } from "./types";
 
 type StoredBatch = Omit<GenerationBatch, "items"> & { itemIds: string[] };
 
-// TEMPORARY (until stage D): process-local store for running the app without Supabase.
-// Not shared between serverless instances, no RLS and no lease on stuck items; the Supabase
-// repository replaces it.
+// Unit-test double for the Supabase repository (D12): same semantics (tenant scope, claim with
+// lease, attempt compare-and-set), process-local and without RLS. The app never uses it.
 export class MemoryGenerationRepository implements GenerationRepository {
   private readonly batches = new Map<string, StoredBatch>();
   private readonly items = new Map<string, GenerationItem>();
@@ -47,9 +47,21 @@ export class MemoryGenerationRepository implements GenerationRepository {
     return batch && batch.tenantId === tenantId ? this.snapshot(batchId) : null;
   }
 
-  async claimItem(tenantId: string, batchId: string, itemId: string) {
+  async claimItem(
+    tenantId: string,
+    batchId: string,
+    itemId: string,
+    now = Date.now(),
+  ) {
     const item = this.ownedItem(tenantId, batchId, itemId);
-    if (!item || item.status === "running" || item.status === "succeeded") {
+    const leaseExpired =
+      item?.status === "running" &&
+      now - Date.parse(item.runningSince) > ITEM_LEASE_MS;
+    if (
+      !item ||
+      item.status === "succeeded" ||
+      (item.status === "running" && !leaseExpired)
+    ) {
       return null;
     }
     // Built field by field so a previous attempt's error does not carry over.
@@ -62,8 +74,9 @@ export class MemoryGenerationRepository implements GenerationRepository {
       prompt: item.prompt,
       config: item.config,
       status: "running",
+      runningSince: new Date(now).toISOString(),
       attempts: item.attempts + 1,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(now).toISOString(),
     };
     this.items.set(itemId, running);
     return structuredClone(running);
@@ -98,6 +111,21 @@ export class MemoryGenerationRepository implements GenerationRepository {
     const item = this.items.get(itemId);
     if (!item || item.tenantId !== tenantId) return null;
     return this.images.get(itemId) ?? null;
+  }
+
+  async countAttemptsSince(tenantId: string, since: Date) {
+    let total = 0;
+    for (const batch of this.batches.values()) {
+      if (
+        batch.tenantId !== tenantId ||
+        Date.parse(batch.createdAt) < since.getTime()
+      ) {
+        continue;
+      }
+      for (const id of batch.itemIds)
+        total += this.items.get(id)?.attempts ?? 0;
+    }
+    return total;
   }
 
   private ownedItem(tenantId: string, batchId: string, itemId: string) {

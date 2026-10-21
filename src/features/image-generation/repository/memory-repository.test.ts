@@ -3,7 +3,7 @@ import { buildBrief } from "../brief/build-brief";
 import { GLOBAL_KNOWLEDGE } from "../knowledge/mock-knowledge";
 import { freshRequest, demoTenant } from "../test-fixtures";
 import { MemoryGenerationRepository } from "./memory-repository";
-import type { GenerationBatch, NewBatch } from "./types";
+import { ITEM_LEASE_MS, type GenerationBatch, type NewBatch } from "./types";
 
 const request = freshRequest();
 const brief = buildBrief(GLOBAL_KNOWLEDGE, demoTenant("demo-fresh"), request);
@@ -112,5 +112,46 @@ describe("MemoryGenerationRepository", () => {
     );
     expect(item).toMatchObject({ status: "running", attempts: 2 });
     expect(await repo.getImage("tenant-a", id)).toBeNull();
+  });
+
+  it("claims a running item again only after its lease expired", async () => {
+    const repo = new MemoryGenerationRepository();
+    const batch = await repo.createBatch(newBatch("tenant-a"));
+    const item = firstItem(batch);
+    const start = Date.parse("2026-10-21T12:00:00.000Z");
+
+    const first = await repo.claimItem("tenant-a", batch.id, item.id, start);
+    expect(first?.attempts).toBe(1);
+    expect(
+      await repo.claimItem(
+        "tenant-a",
+        batch.id,
+        item.id,
+        start + ITEM_LEASE_MS,
+      ),
+    ).toBeNull();
+
+    const reclaimed = await repo.claimItem(
+      "tenant-a",
+      batch.id,
+      item.id,
+      start + ITEM_LEASE_MS + 1,
+    );
+    expect(reclaimed?.attempts).toBe(2);
+    // The first, superseded attempt can no longer record a result.
+    expect(
+      await repo.completeItem("tenant-a", batch.id, item.id, 1, image),
+    ).toBeNull();
+  });
+
+  it("counts attempts per tenant", async () => {
+    const repo = new MemoryGenerationRepository();
+    const batch = await repo.createBatch(newBatch("tenant-a"));
+    await repo.claimItem("tenant-a", batch.id, firstItem(batch).id);
+    await repo.createBatch(newBatch("tenant-b"));
+
+    const since = new Date(Date.now() - 60_000);
+    expect(await repo.countAttemptsSince("tenant-a", since)).toBe(1);
+    expect(await repo.countAttemptsSince("tenant-b", since)).toBe(0);
   });
 });

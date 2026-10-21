@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   BriefConflictError,
+  DailyLimitError,
   InvalidSourceBatchError,
   NotFoundError,
   ProviderError,
@@ -13,6 +14,7 @@ import type {
   ImageProvider,
   ProviderConfig,
 } from "../providers/types";
+import { providerConfigSchema } from "../repository/rows";
 import { MemoryGenerationRepository } from "../repository/memory-repository";
 import type { GenerationBatch } from "../repository/types";
 import {
@@ -61,6 +63,7 @@ function context(
   tenantId: string,
   provider: ImageProvider,
   repository = new MemoryGenerationRepository(),
+  dailyAttemptLimit = 100,
 ): RequestContext {
   return {
     tenant: { tenantId, userId: "test-user", role: "user" },
@@ -74,6 +77,7 @@ function context(
       imageSize: "1K",
       thinkingLevel: "medium",
     }),
+    dailyAttemptLimit,
   };
 }
 
@@ -116,6 +120,64 @@ describe("generation service", () => {
       thinkingLevel: "medium",
     });
   });
+
+  it.each([
+    { model: "another-expensive-model" },
+    { imageSize: "2K" },
+    { imageSize: "4K" },
+    { provider: "mock" },
+    { thinkingLevel: "high" },
+  ] satisfies Partial<ProviderConfig>[])(
+    "blocks a directly inserted snapshot with forbidden settings %j before resolving the provider",
+    async (override) => {
+      const provider = scriptedProvider([]);
+      const ctx = context("demo-fresh", provider);
+      ctx.providerConfigFor = (aspectRatio) => ({
+        provider: "gemini",
+        model: "gemini-demo-approved",
+        aspectRatio,
+        imageSize: "1K",
+        thinkingLevel: "medium",
+      });
+      let resolutions = 0;
+      ctx.resolveProvider = () => {
+        resolutions += 1;
+        return provider;
+      };
+      const original = await createSingleBatch(ctx, freshRequest());
+      const example = onlyItem(original);
+      // Simulates a row inserted through the Data API: structurally valid, not server-planned.
+      const forgedConfig = providerConfigSchema.parse({
+        ...example.config,
+        ...override,
+      });
+      const forged = await ctx.repository.createBatch({
+        tenantId: ctx.tenant.tenantId,
+        kind: "single",
+        sourceBatchId: null,
+        request: original.request,
+        brief: original.brief,
+        items: [
+          {
+            variation: example.variation,
+            prompt: example.prompt,
+            config: forgedConfig,
+          },
+        ],
+      });
+
+      const result = await runItem(ctx, forged.id, onlyItem(forged).id);
+
+      expect(result).toMatchObject({
+        status: "failed",
+        attempts: 1,
+        config: forgedConfig,
+        error: { kind: "invalid", retryable: false },
+      });
+      expect(resolutions).toBe(0);
+      expect(provider.calls).toHaveLength(0);
+    },
+  );
 
   describe("variations", () => {
     it("reuse the example's request and brief for 15 items", async () => {
@@ -265,7 +327,7 @@ describe("generation service", () => {
     });
   });
 
-  it("plans variations with the example's provider snapshot, not the current env", async () => {
+  it("refuses variations when the example snapshot has been revoked by server policy", async () => {
     const repository = new MemoryGenerationRepository();
     const before = context("demo-fresh", scriptedProvider([]), repository);
     const single = await succeededSingle(before);
@@ -280,14 +342,76 @@ describe("generation service", () => {
         thinkingLevel: "high",
       }),
     };
-    const variations = await createVariationsBatch(after, single.id);
-    const exampleItem = onlyItem(single);
+    await expect(
+      createVariationsBatch(after, single.id),
+    ).rejects.toBeInstanceOf(InvalidSourceBatchError);
+    const stored = await repository.getBatch(before.tenant.tenantId, single.id);
+    expect(stored?.items[0]?.config).toEqual(onlyItem(single).config);
+  });
 
-    for (const item of variations.items) {
-      expect(item.config).toEqual(exampleItem.config);
-      expect(item.prompt.systemInstruction).toBe(
-        exampleItem.prompt.systemInstruction,
-      );
+  it("refuses a queued snapshot after a policy change without silently updating it", async () => {
+    const provider = scriptedProvider([]);
+    const ctx = context("demo-fresh", provider);
+    const batch = await createSingleBatch(ctx, freshRequest());
+    const original = onlyItem(batch);
+    const previousConfigFor = ctx.providerConfigFor;
+    ctx.providerConfigFor = (aspectRatio) => ({
+      ...previousConfigFor(aspectRatio),
+      model: "new-approved-model",
+    });
+
+    const result = await runItem(ctx, batch.id, original.id);
+
+    expect(result).toMatchObject({
+      status: "failed",
+      config: original.config,
+      error: { kind: "invalid", retryable: false },
+    });
+    expect(provider.calls).toHaveLength(0);
+  });
+
+  describe("daily attempt limit", () => {
+    it("refuses to start a run past the limit without calling the provider", async () => {
+      const provider = scriptedProvider([]);
+      const ctx = context("demo-fresh", provider, undefined, 1);
+      await succeededSingle(ctx);
+      const second = await createSingleBatch(ctx, freshRequest());
+
+      await expect(
+        runItem(ctx, second.id, onlyItem(second).id),
+      ).rejects.toBeInstanceOf(DailyLimitError);
+      expect(provider.calls).toHaveLength(1);
+    });
+
+    it("still returns finished items once the limit is reached", async () => {
+      const ctx = context("demo-fresh", scriptedProvider([]), undefined, 1);
+      const batch = await succeededSingle(ctx);
+
+      const item = await runItem(ctx, batch.id, onlyItem(batch).id);
+      expect(item.status).toBe("succeeded");
+    });
+
+    it("counts each tenant separately", async () => {
+      const repository = new MemoryGenerationRepository();
+      const provider = scriptedProvider([]);
+      await succeededSingle(context("demo-fresh", provider, repository, 1));
+
+      const travel = context("demo-travel", provider, repository, 1);
+      const batch = await createSingleBatch(travel, travelRequest());
+      const item = await runItem(travel, batch.id, onlyItem(batch).id);
+      expect(item.status).toBe("succeeded");
+    });
+  });
+
+  it("stores a generic message for a failure, not the provider's raw text", async () => {
+    const ctx = context("demo-fresh", scriptedProvider(["billing"]));
+    const batch = await createSingleBatch(ctx, freshRequest());
+
+    const item = await runItem(ctx, batch.id, onlyItem(batch).id);
+    expect(item.status).toBe("failed");
+    if (item.status === "failed") {
+      expect(item.error.kind).toBe("billing");
+      expect(item.error.message).not.toContain("fake billing");
     }
   });
 });
