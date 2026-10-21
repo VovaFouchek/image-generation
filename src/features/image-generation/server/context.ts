@@ -36,7 +36,11 @@ export interface RequestContext {
 export const getRequestContext = cache(async (): Promise<RequestContext> => {
   const supabase = await createSupabaseServerClient();
   const tenant = await getSessionTenant(supabase);
-  if (!tenant) throw new UnauthorizedError("Sign in first");
+
+  if (!tenant) {
+    throw new UnauthorizedError("Sign in first");
+  }
+
   return {
     tenant,
     repository: createSupabaseGenerationRepository(supabase),

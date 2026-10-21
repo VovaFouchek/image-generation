@@ -1,7 +1,3 @@
-// Option lists for the generation form.
-// Values are stable identifiers stored with every generation; labels are UI-only.
-// Main colour swatches are not listed here: they come from the tenant's palette.
-
 export const STYLES = ["simple", "abstract", "other"] as const;
 export type Style = (typeof STYLES)[number];
 
@@ -25,6 +21,7 @@ export const FORMATS = {
     promptLabel: "Wide 16:9 landscape",
   },
 } as const;
+
 export type Format = keyof typeof FORMATS;
 export type AspectRatio = (typeof FORMATS)[Format]["aspectRatio"];
 export const FORMAT_KEYS = [

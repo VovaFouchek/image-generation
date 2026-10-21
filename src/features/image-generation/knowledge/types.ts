@@ -1,7 +1,3 @@
-// Layers 1 and 2 of the brief. In the platform these come from uploaded documents and the
-// existing text pipeline; here they are already-structured, prompt-ready records (English),
-// while page titles and summaries stay in the client's language and are treated as data.
-
 export type RuleStrength = "required" | "default";
 
 export interface Rule {
@@ -29,7 +25,6 @@ export interface PaletteColor {
   hex: string;
 }
 
-/** A client's target audience (doelgroep): who and what the image shows for them. */
 export interface AudienceSegment {
   id: string;
   label: string;

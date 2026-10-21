@@ -35,19 +35,27 @@ export function buildBrief(
   const page = tenant.pages.find(
     (candidate) => candidate.id === request.pageId,
   );
-  if (!page) throw new UnknownReferenceError("pageId", request.pageId);
+
+  if (!page) {
+    throw new UnknownReferenceError("pageId", request.pageId);
+  }
+
   const segment = tenant.segments.find(
     (candidate) => candidate.id === request.brandSegmentId,
   );
+
   if (!segment)
     throw new UnknownReferenceError("brandSegmentId", request.brandSegmentId);
+
   const mainColor = tenant.palette.find(
     (candidate) => candidate.id === request.mainColorId,
   );
+
   if (!mainColor)
     throw new UnknownReferenceError("mainColorId", request.mainColorId);
 
   const abstract = request.style === "abstract";
+
   assertNoConflicts(
     [...global.principles, ...tenant.rules],
     segment.showsPeople && !abstract,

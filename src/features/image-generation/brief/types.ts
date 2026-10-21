@@ -5,7 +5,6 @@ import type { RuleStrength } from "../knowledge/types";
 
 export const BRIEF_SCHEMA_VERSION = 1;
 
-/** Where a decision came from. Lets us explain and reproduce every brief. */
 export type Provenance =
   | { source: "global"; ruleId: string }
   | { source: "tenant"; field: string }

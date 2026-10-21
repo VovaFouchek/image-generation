@@ -2,17 +2,11 @@ import type { ColorTreatment, Variation, VisualBrief } from "../brief/types";
 import { toInlineData } from "../domain/inline-data";
 import type { GlobalKnowledge } from "../knowledge/types";
 
-// Template follows .agents/docs/nano-banana-prompting-research.md §1.4: one descriptive English
-// brief in a fixed order (purpose → style → scene → composition → palette → rules), with
-// client content quoted as data. Bump the version on any wording change; it is stored with
-// every generation for reproducibility.
 export const PROMPT_TEMPLATE_VERSION = "nb21-v2";
 
 export interface ComposedPrompt {
   templateVersion: string;
-  /** Goldfizh vision: identical for every tenant. Sent as the system instruction. */
   systemInstruction: string;
-  /** Client knowledge + request, sent as the user turn. */
   prompt: string;
 }
 
@@ -97,7 +91,6 @@ function composeUserPrompt(brief: VisualBrief, variation?: Variation): string {
   return lines.join("\n");
 }
 
-/** "Calm, practical and friendly." → "calm, practical and friendly" for use mid-sentence. */
 function asClause(text: string) {
   const trimmed = text.trim().replace(/[.\s]+$/, "");
   return trimmed.charAt(0).toLowerCase() + trimmed.slice(1);

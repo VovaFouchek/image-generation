@@ -29,11 +29,13 @@ export function planVariations(brief: VisualBrief, count: number): Variation[] {
       },
     ];
   }
+
   if (!Number.isInteger(count) || count < 1 || count > BATCH_SIZE) {
     throw new RangeError(
       `count must be between 1 and ${BATCH_SIZE}, got ${count}`,
     );
   }
+
   return Array.from({ length: count }, (_, index) => ({
     index,
     axes: {

@@ -18,12 +18,15 @@ export async function DemoSessionGate({
 }) {
   const { tenant, ...rest } = await searchParams;
   const query = new URLSearchParams();
+
   for (const [key, value] of Object.entries(rest)) {
     if (typeof value === "string") query.set(key, value);
   }
+
   await ensureDemoSession({
     requestedTenant: typeof tenant === "string" ? tenant : undefined,
     returnTo: query.size > 0 ? `${path}?${query.toString()}` : path,
   });
+
   return children;
 }

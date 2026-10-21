@@ -8,7 +8,6 @@ const TONES = {
   danger: "bg-danger-soft text-danger",
 } as const;
 
-// sm: card status (13:27) · md: preview status (3:53) · pill: batch counters (13:15)
 const SIZES = {
   sm: "rounded-badge px-2 py-1 text-badge-sm",
   md: "rounded-pill px-3 py-1.5 text-badge",

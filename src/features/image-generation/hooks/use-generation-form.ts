@@ -58,20 +58,27 @@ export function useGenerationForm(options: FormOptionsView) {
 
   async function submit() {
     const missing = requiredErrors(values);
+
     if (Object.keys(missing).length > 0) {
       setErrors(missing);
       return;
     }
+
     setErrors({});
     setPreview({ kind: "generating" });
+
     try {
       const batch = await createBatch({
         kind: "single",
         request: toRequest(values),
       });
+
       const [item] = batch.items;
+
       if (!item) throw new Error("Batch has no items");
+
       const result = await runItem(batch.id, item.id);
+
       setPreview(
         result.status === "succeeded"
           ? { kind: "ready", batchId: batch.id, item: result, stale: false }
@@ -87,6 +94,7 @@ export function useGenerationForm(options: FormOptionsView) {
       if (error instanceof ApiError) {
         const fieldErrors = toFieldErrors(error);
         if (Object.keys(fieldErrors).length > 0) setErrors(fieldErrors);
+
         setPreview({ kind: "failed", message: error.message });
       } else {
         setPreview({ kind: "failed", message: GENERATOR_TEXT.errors.network });
@@ -139,7 +147,9 @@ function isFormField(value: unknown): value is FormField {
 /** Maps server validation (zod issues or an unknown reference) onto form fields. */
 function toFieldErrors(error: ApiError): Partial<Record<FormField, string>> {
   const result: Partial<Record<FormField, string>> = {};
+
   if (isFormField(error.field)) result[error.field] = error.message;
+
   for (const issue of error.issues) {
     const field = issue.path.at(-1);
     if (isFormField(field)) result[field] = issue.message;

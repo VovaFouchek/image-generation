@@ -10,7 +10,6 @@ interface ResolvedVisualStyle {
   composition: VisualBrief["composition"];
 }
 
-/** Photo defaults are a fallback, not mandatory rules for an explicitly chosen style. */
 export function resolveVisualStyle(
   tenant: TenantKnowledge,
   request: GenerationRequest,

@@ -11,7 +11,6 @@ export class BriefConflictError extends Error {
   }
 }
 
-/** The request points at a page, segment or colour the tenant does not have. */
 export class UnknownReferenceError extends Error {
   readonly code = "unknown_reference";
   constructor(
@@ -22,7 +21,6 @@ export class UnknownReferenceError extends Error {
   }
 }
 
-/** Variations must start from the user's own successful single generation. */
 export class InvalidSourceBatchError extends Error {
   readonly code = "invalid_source_batch";
 }
@@ -31,12 +29,10 @@ export class NotFoundError extends Error {
   readonly code = "not_found";
 }
 
-/** No signed-in user: the host must establish a session first. */
 export class UnauthorizedError extends Error {
   readonly code = "unauthorized";
 }
 
-/** The application-level daily attempt check rejected a new run. */
 export class DailyLimitError extends Error {
   readonly code = "daily_limit_reached";
 }

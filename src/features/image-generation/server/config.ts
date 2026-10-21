@@ -13,7 +13,6 @@ const envSchema = z.object({
   // Mock only: share of items whose first attempt fails, to exercise retry UI (0–1).
   MOCK_FAILURE_RATE: z.coerce.number().min(0).max(1).default(0),
   BATCH_CONCURRENCY: z.coerce.number().int().min(1).max(10).default(3),
-  // Application-level attempt check; not an atomic or tamper-proof spending cap.
   DAILY_ATTEMPT_LIMIT: z.coerce.number().int().min(1).default(100),
 });
 

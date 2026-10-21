@@ -1,7 +1,6 @@
 import { cn } from "../lib/cn";
 
 export function SpinnerIcon({ className }: { className?: string }) {
-  // Center the circular arc (9.46, 9.46), rather than the arrow's wider bounds.
   return (
     <span
       aria-hidden="true"

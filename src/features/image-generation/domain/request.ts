@@ -35,7 +35,6 @@ export const generationRequestSchema = z
 
 export type GenerationRequest = z.infer<typeof generationRequestSchema>;
 
-/** Body of POST /batches: a new single generation, or 15 variations of an existing one. */
 export const createBatchBodySchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("single"), request: generationRequestSchema }),
   z.object({ kind: z.literal("variations"), from: z.uuid() }),

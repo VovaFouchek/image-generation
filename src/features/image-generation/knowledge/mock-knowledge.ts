@@ -1,11 +1,6 @@
 import "server-only";
 import type { GlobalKnowledge, TenantKnowledge } from "./types";
 
-// DEMO DATA. Goldfizh's internal vision/benchmarks and real client guidelines were not provided;
-// All names, brand rules and page content are fictional demo material. Public food-delivery
-// and travel businesses informed the scenarios, not their identities or private guidelines.
-// Research and sample combinations: .agents/docs/demo-scenarios.md.
-
 export const GLOBAL_KNOWLEDGE: GlobalKnowledge = {
   version: "demo-2026-10-21",
   principles: [

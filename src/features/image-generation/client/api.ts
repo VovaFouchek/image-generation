@@ -23,8 +23,13 @@ async function request<T>(
     ...init,
     headers: { "content-type": "application/json", ...init?.headers },
   });
+
   const body: unknown = await response.json().catch(() => null);
-  if (!response.ok) throw toApiError(response.status, body);
+
+  if (!response.ok) {
+    throw toApiError(response.status, body);
+  }
+
   return schema.parse(body);
 }
 
@@ -32,6 +37,7 @@ function toApiError(status: number, body: unknown): ApiError {
   if (typeof body !== "object" || body === null) {
     return new ApiError(status, "Request failed");
   }
+
   const message =
     "message" in body && typeof body.message === "string"
       ? body.message
@@ -51,6 +57,7 @@ function toApiError(status: number, body: unknown): ApiError {
             : [],
         )
       : [];
+
   return new ApiError(status, message, field, issues);
 }
 

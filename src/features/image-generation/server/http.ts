@@ -10,7 +10,6 @@ import {
   UnknownReferenceError,
 } from "../domain/errors";
 
-/** Maps feature errors to JSON responses so route handlers stay one-liners. */
 export function toErrorResponse(error: unknown) {
   if (error instanceof z.ZodError) {
     return Response.json(
@@ -61,5 +60,6 @@ export function toErrorResponse(error: unknown) {
     );
   }
   console.error(error);
+
   return Response.json({ error: "internal_error" }, { status: 500 });
 }

@@ -15,13 +15,11 @@ export interface ChoiceGroupProps {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** Submits the selected value with a surrounding form. */
   name?: string;
   "aria-labelledby"?: string;
   className?: string;
 }
 
-/** Single choice from a row of chips (Style, Colors, Format). Owns selection and keyboard only. */
 export function ChoiceGroup({
   options,
   value,
