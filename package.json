@@ -12,7 +12,12 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "db:start": "supabase start",
-    "db:reset": "supabase db reset"
+    "db:reset": "supabase db reset",
+    "db:link": "supabase link --project-ref cdmogdwwuawqvdspdchp",
+    "db:push": "supabase db push --linked",
+    "db:types": "supabase gen types typescript --linked --schema public > src/lib/supabase/database.types.ts",
+    "db:seed": "node --conditions=react-server --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env scripts/seed-demo.mts",
+    "test:integration": "vitest run --config vitest.integration.config.mts"
   },
   "dependencies": {
     "@google/genai": "2.30.0",
