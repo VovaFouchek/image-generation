@@ -9,6 +9,7 @@ import {
 } from "../domain/errors";
 import { BATCH_SIZE } from "../domain/options";
 import type { GenerationRequest } from "../domain/request";
+import type { FormOptionsView } from "../domain/views";
 import { composePrompt, type ComposedPrompt } from "../prompt/compose-prompt";
 import type { GeneratedImage, ProviderConfig } from "../providers/types";
 import type {
@@ -85,6 +86,24 @@ export async function createVariationsBatch(
       systemInstruction: example.prompt.systemInstruction,
     }),
   });
+}
+
+/** Options for the generation form: only what the UI shows, never rules or prompt text. */
+export async function getFormOptions(
+  ctx: RequestContext,
+): Promise<FormOptionsView> {
+  const tenant = await ctx.knowledge.getTenant(ctx.tenant.tenantId);
+  if (!tenant) throw new NotFoundError(`Unknown tenant ${ctx.tenant.tenantId}`);
+  const [firstColor] = tenant.palette;
+  if (!firstColor)
+    throw new Error(`Tenant ${tenant.tenantId} has an empty palette`);
+  return {
+    brandName: tenant.brandName,
+    pages: tenant.pages.map(({ id, url }) => ({ id, url })),
+    segments: tenant.segments.map(({ id, label }) => ({ id, label })),
+    palette: tenant.palette.map(({ id, name, hex }) => ({ id, name, hex })),
+    defaultMainColorId: firstColor.id,
+  };
 }
 
 export async function getBatch(ctx: RequestContext, batchId: string) {

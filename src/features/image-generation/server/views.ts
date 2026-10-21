@@ -1,4 +1,5 @@
 import "server-only";
+import { API_BASE } from "../domain/api";
 import type { ProviderErrorKind } from "../domain/errors";
 import type { BatchView, ItemView } from "../domain/views";
 import type { GenerationBatch, GenerationItem } from "../repository/types";
@@ -14,9 +15,6 @@ const PUBLIC_ERROR_MESSAGES: Record<ProviderErrorKind, string> = {
   safety: "The image was declined by the content filter. Try other settings.",
   invalid: "Image generation is not set up correctly.",
 };
-
-/** Where the host mounts the feature's API (see app/api/image-generation). */
-export const API_BASE = "/api/image-generation";
 
 export function toItemView(item: GenerationItem): ItemView {
   const base = { id: item.id, index: item.index, attempts: item.attempts };
