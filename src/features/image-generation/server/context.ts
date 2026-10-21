@@ -24,12 +24,12 @@ export interface RequestContext {
   knowledge: KnowledgeSource;
   resolveProvider(name: string): ImageProvider;
   providerConfigFor(aspectRatio: AspectRatio): ProviderConfig;
-  /** Generation attempts a tenant may start per 24 hours (DD13). */
+  /** Generation attempts a tenant may start per 24 hours. */
   dailyAttemptLimit: number;
 }
 
 /**
- * Builds the context from the Supabase session (D11, D16): the tenant comes from the verified
+ * Builds the context from the Supabase session: the tenant comes from the verified
  * user and tenant_members, never from the request; storage and knowledge use that user's client,
  * so RLS applies to every query. Memoised per server render.
  */

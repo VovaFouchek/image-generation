@@ -10,7 +10,6 @@ export interface PanelProps {
   className?: string;
 }
 
-/** Titled panel (Figma 2:9 form panel, 2:10 preview panel). */
 export function Panel({ title, aside, children, className }: PanelProps) {
   return (
     <Surface

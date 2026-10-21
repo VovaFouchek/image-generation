@@ -46,7 +46,7 @@ export async function getBatchRoute(
   }
 }
 
-/** POST — generates one item (or retries a failed one). One provider call per request. */
+/** POST — runs or retries one image, including any permitted automatic retry. */
 export async function runItemRoute(
   _request: Request,
   { params }: Params<"batchId" | "itemId">,

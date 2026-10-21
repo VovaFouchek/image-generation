@@ -1,11 +1,5 @@
-// Seeds the DEMO data (D16): one Auth account per fictional demo tenant, the tenants, their
-// membership and the knowledge versions (Goldfizh vision + client knowledge). Idempotent: run it
-// again after changing the demo knowledge (with a new version string) or the password.
-//
-//   pnpm db:seed
-//
-// The only place in the project that uses the secret key: creating Auth users needs the admin
-// API, and knowledge has no write policies (in the platform the Goldfizh admin uploads it).
+// Seeds demo accounts, membership and versioned knowledge using the admin client.
+// Rerun after changing knowledge (with a new version string) or the demo password.
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import {

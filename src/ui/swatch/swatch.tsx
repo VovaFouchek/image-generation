@@ -13,7 +13,6 @@ export type SwatchProps = Omit<
   selected: boolean;
 };
 
-/** One colour of a SwatchGroup (Figma 3:32 selected, 3:33 unselected). */
 export function Swatch({
   hex,
   name,

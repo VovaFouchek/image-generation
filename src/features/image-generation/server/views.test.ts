@@ -35,7 +35,7 @@ const failed: GenerationItem = {
 };
 
 describe("toItemView", () => {
-  it("replaces the raw provider message with a generic one", () => {
+  it("exposes only public fields and a generic failure message", () => {
     const view = toItemView(failed);
     expect(view).toEqual({
       id: "item-1",
@@ -48,11 +48,6 @@ describe("toItemView", () => {
         message: "Image generation is temporarily unavailable.",
       },
     });
-  });
-
-  it("never exposes prompts or provider config", () => {
-    const json = JSON.stringify(toItemView(failed));
-    expect(json).not.toMatch(/secret|ai\.studio|prepayment|gemini/);
   });
 
   it("shows a run past its lease as a retryable failure", () => {

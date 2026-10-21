@@ -6,7 +6,6 @@ export type ChipProps = Omit<ComponentProps<"button">, "role"> & {
   selected: boolean;
 };
 
-/** One option of a ChoiceGroup (Figma 3:14 selected, 3:16 unselected). */
 export function Chip({
   selected,
   type = "button",

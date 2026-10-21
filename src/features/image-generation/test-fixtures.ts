@@ -1,8 +1,17 @@
 import type { GenerationRequest } from "./domain/request";
-import { findTenantKnowledge } from "./knowledge/mock-knowledge";
+import {
+  GLOBAL_KNOWLEDGE,
+  findTenantKnowledge,
+} from "./knowledge/mock-knowledge";
+import type { KnowledgeSource } from "./knowledge/source";
 import type { TenantKnowledge } from "./knowledge/types";
 
 // Shared helpers for unit tests only.
+
+export const mockKnowledgeSource: KnowledgeSource = {
+  getGlobal: async () => GLOBAL_KNOWLEDGE,
+  getTenant: async (tenantId) => findTenantKnowledge(tenantId) ?? null,
+};
 
 /** Deliberate conflict for validation tests, independent of public demo brand rules. */
 export function withNoPeopleRule(tenant: TenantKnowledge): TenantKnowledge {

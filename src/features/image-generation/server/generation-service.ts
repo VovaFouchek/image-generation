@@ -33,7 +33,7 @@ import { publicErrorMessage } from "./views";
  * call is aborted and fails as transient instead of being killed with the function.
  */
 export const PROVIDER_BUDGET_MS = 100_000;
-/** D8: one automatic retry, only for transient errors and rate limits. */
+/** One automatic retry, only for transient errors and rate limits. */
 const AUTO_RETRIES = 1;
 /** A retry needs at least this much of the budget left; a real call takes ~15 s. */
 const MIN_RETRY_WINDOW_MS = 20_000;
@@ -149,7 +149,7 @@ export async function runItem(
 
   const outcome = await generateWithRetry(ctx, claimed, Date.now() + budgetMs);
   if (outcome.kind === "error") {
-    // The raw provider message stays in server logs and storage; the browser gets a generic one.
+    // Keep the raw provider message in server logs; persist and return only a generic message.
     console.warn(
       `Item ${itemId} attempt ${claimed.attempts} failed (${outcome.error.kind}): ${outcome.error.message}`,
     );

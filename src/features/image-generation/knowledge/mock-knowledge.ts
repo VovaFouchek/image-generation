@@ -1,5 +1,4 @@
 import "server-only";
-import type { KnowledgeSource } from "./source";
 import type { GlobalKnowledge, TenantKnowledge } from "./types";
 
 // DEMO DATA. Goldfizh's internal vision/benchmarks and real client guidelines were not provided;
@@ -45,7 +44,7 @@ export const GLOBAL_KNOWLEDGE: GlobalKnowledge = {
 const TENANTS: Record<string, TenantKnowledge> = {
   "demo-fresh": {
     tenantId: "demo-fresh",
-    version: "demo-2026-10-21-fresh-v1",
+    version: "demo-2026-10-21-fresh-v2",
     brandName: "Freshday Market (demo)",
     brandDescription:
       "a fictional Dutch service delivering fresh fruit and vegetables in reusable crates to homes and workplaces",
@@ -108,7 +107,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
         description:
           "busy households making fresh fruit and vegetables part of their daily routine",
         setting:
-          "on a pale wooden kitchen counter in a Dutch family home, with an adult reaching for an apple beside the crate",
+          "on a pale wooden kitchen counter in a Dutch family home, with an adult reaching toward the food beside the crate",
         mood: "welcoming, practical and unhurried",
         showsPeople: true,
       },
@@ -118,7 +117,7 @@ const TENANTS: Record<string, TenantKnowledge> = {
         description:
           "office teams sharing an easy fresh-food break during the working day",
         setting:
-          "on a shared office kitchenette counter, with two colleagues choosing fruit and softly blurred desks in the background",
+          "on a shared office kitchenette counter, with two colleagues choosing food and softly blurred desks in the background",
         mood: "sociable, fresh and quietly energetic",
         showsPeople: true,
       },
@@ -127,13 +126,13 @@ const TENANTS: Record<string, TenantKnowledge> = {
       {
         id: "fresh-delivery",
         url: "https://freshday.example/fresh-delivery",
-        title: "Fresh produce delivery",
+        title: "Fresh salads and vegetables delivery",
         summary:
-          "Fresh fruit and vegetables delivered in a reusable crate, ready to unpack and enjoy at home or work.",
+          "Crisp vegetables and ready-to-eat salads delivered in a reusable crate, ready to unpack for a quick lunch or dinner at home or work.",
         message:
-          "show how fresh-food delivery fits naturally into everyday life",
+          "show how fresh salad and vegetable delivery fits naturally into everyday meals",
         subject:
-          "an open reusable grocery crate, just delivered, holds red apples, green pears, carrots and cucumbers with a plain delivery tote alongside",
+          "an open reusable grocery crate, just delivered, holds glass jars of layered salads, leafy lettuce, cherry tomatoes, carrots and cucumbers with a plain delivery tote alongside",
         accentAnchor: "the reusable crate handles",
       },
       {
@@ -274,8 +273,3 @@ export function findTenantKnowledge(
 ): TenantKnowledge | undefined {
   return TENANTS[tenantId];
 }
-
-export const mockKnowledgeSource: KnowledgeSource = {
-  getGlobal: async () => GLOBAL_KNOWLEDGE,
-  getTenant: async (tenantId) => findTenantKnowledge(tenantId) ?? null,
-};

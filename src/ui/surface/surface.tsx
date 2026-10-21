@@ -10,7 +10,6 @@ export type SurfaceProps = ComponentProps<"div"> & {
   radius?: keyof typeof RADII;
 };
 
-/** White bordered surface: panels (2:9) and variant cards (13:23). Padding is the caller's. */
 export function Surface({
   radius = "panel",
   className,

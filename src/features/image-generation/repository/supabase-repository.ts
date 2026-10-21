@@ -11,7 +11,7 @@ import {
 } from "./rows";
 import type { GenerationRepository, RunningItem } from "./types";
 
-// Postgres + Storage under the signed-in user's session (D16): RLS scopes every row and file to
+// Postgres + Storage under the signed-in user's session: RLS scopes every row and file to
 // the caller's tenant; the tenantId filters below are a second line, not the protection.
 // Schema: supabase/migrations/*_image_generation.sql.
 
@@ -46,7 +46,7 @@ export function createSupabaseGenerationRepository(
     return data ? toGenerationBatch(batchRowSchema.parse(data)) : null;
   }
 
-  /** Compare-and-set on the attempt: 0 rows means a newer attempt took over (R6). */
+  /** Compare-and-set on the attempt: 0 rows means a newer attempt took over. */
   async function finishAttempt(
     tenantId: string,
     batchId: string,

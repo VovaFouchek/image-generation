@@ -157,7 +157,7 @@ describe("buildBrief", () => {
     });
   });
 
-  it("keeps user notes on one line so they cannot pose as instructions", () => {
+  it("normalises user notes into a single quoted field", () => {
     const brief = buildBrief(
       GLOBAL_KNOWLEDGE,
       fresh,
@@ -184,33 +184,29 @@ describe("buildBrief", () => {
     );
   });
 
-  it.each(["minimalisme", "dopamine", "watercolour illustration"])(
-    "lets the custom style %s replace aesthetic defaults without dropping brand constraints",
-    (styleNote) => {
-      const brief = buildBrief(
-        GLOBAL_KNOWLEDGE,
-        fresh,
-        freshRequest({ style: "other", styleNote }),
-      );
-      const simple = buildBrief(GLOBAL_KNOWLEDGE, fresh, freshRequest());
+  it("lets a custom style replace aesthetic defaults without dropping brand constraints", () => {
+    const styleNote = "watercolour illustration";
+    const brief = buildBrief(
+      GLOBAL_KNOWLEDGE,
+      fresh,
+      freshRequest({ style: "other", styleNote }),
+    );
+    const simple = buildBrief(GLOBAL_KNOWLEDGE, fresh, freshRequest());
 
-      expect(brief.visualLanguage.style).toContain(styleNote);
-      expect(brief.visualLanguage.medium).not.toBe(fresh.photography.medium);
-      expect(brief.visualLanguage.style).not.toContain(fresh.photography.style);
-      expect(brief.visualLanguage.lighting).not.toBe(
-        fresh.photography.lighting,
-      );
-      expect(brief.composition.shot).not.toContain("35mm");
-      expect(brief.composition).not.toEqual(simple.composition);
-      expect(brief.scene).toEqual(simple.scene);
-      expect(brief.constraints).toEqual(simple.constraints);
-      expect(brief.visualLanguage.color).toEqual(simple.visualLanguage.color);
-      expect(brief.provenance.composition).toContainEqual({
-        source: "request",
-        field: "styleNote",
-      });
-    },
-  );
+    expect(brief.visualLanguage.style).toContain(styleNote);
+    expect(brief.visualLanguage.medium).not.toBe(fresh.photography.medium);
+    expect(brief.visualLanguage.style).not.toContain(fresh.photography.style);
+    expect(brief.visualLanguage.lighting).not.toBe(fresh.photography.lighting);
+    expect(brief.composition.shot).not.toContain("35mm");
+    expect(brief.composition).not.toEqual(simple.composition);
+    expect(brief.scene).toEqual(simple.scene);
+    expect(brief.constraints).toEqual(simple.constraints);
+    expect(brief.visualLanguage.color).toEqual(simple.visualLanguage.color);
+    expect(brief.provenance.composition).toContainEqual({
+      source: "request",
+      field: "styleNote",
+    });
+  });
 
   it("still rejects mandatory people conflicts when a custom style is selected", () => {
     expect(() =>

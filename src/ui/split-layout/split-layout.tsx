@@ -6,7 +6,6 @@ export interface SplitLayoutProps {
   children: ReactNode;
 }
 
-/** Form panel + flexible preview, 32px apart; stacks below the lg breakpoint. */
 export function SplitLayout({ aside, children }: SplitLayoutProps) {
   return (
     <div className="flex flex-1 flex-col gap-8 lg:flex-row">

@@ -12,7 +12,7 @@ import {
 
 type StoredBatch = Omit<GenerationBatch, "items"> & { itemIds: string[] };
 
-// Unit-test double for the Supabase repository (D12): same semantics (tenant scope, claim with
+// Unit-test double for the Supabase repository: same semantics (tenant scope, claim with
 // lease, attempt compare-and-set), process-local and without RLS. The app never uses it.
 export class MemoryGenerationRepository implements GenerationRepository {
   private readonly batches = new Map<string, StoredBatch>();

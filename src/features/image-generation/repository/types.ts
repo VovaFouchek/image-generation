@@ -47,7 +47,6 @@ export type GenerationItem =
     })
   | (ItemBase & { status: "failed"; error: ItemError });
 
-export type ItemStatus = GenerationItem["status"];
 export type RunningItem = Extract<GenerationItem, { status: "running" }>;
 
 export interface GenerationBatch {
@@ -124,6 +123,6 @@ export interface GenerationRepository {
     error: ItemError,
   ): Promise<GenerationItem | null>;
   getImage(tenantId: string, itemId: string): Promise<StoredImage | null>;
-  /** Attempts made on items the tenant created since then; feeds the daily limit (DD13). */
+  /** Attempts made on items the tenant created since then; feeds the daily limit. */
   countAttemptsSince(tenantId: string, since: Date): Promise<number>;
 }

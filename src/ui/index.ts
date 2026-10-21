@@ -1,4 +1,3 @@
-// Public API of the UI system. Features import from "@/ui" only.
 export * from "./app-header";
 export * from "./badge";
 export * from "./button";

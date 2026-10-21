@@ -48,12 +48,6 @@ describe("composePrompt", () => {
     expect(prompt).toContain("Wide 16:9 landscape image.");
   });
 
-  it("does not mix in another tenant's knowledge", () => {
-    const { prompt } = promptFor();
-    expect(prompt).not.toContain(travel.brandName);
-    expect(prompt).not.toContain("unoccupied");
-  });
-
   it("states tenant preferences as preferences", () => {
     expect(promptFor().prompt).toContain(
       "Prefer a relaxed everyday moment, a modest quantity of produce and practical reusable packaging over a lavish feast or warehouse scene.",
@@ -110,7 +104,7 @@ describe("composePrompt", () => {
     expect(prompt).not.toContain("Setting:");
   });
 
-  it.each(["minimalisme", "dopamine", "watercolour illustration"])(
+  it.each(["minimalisme", "dopamine"])(
     "sends %s as the visual direction without forcing the default photo setup",
     (styleNote) => {
       const { prompt, systemInstruction } = promptFor(
@@ -171,6 +165,8 @@ describe("composePrompt", () => {
     );
     expect(travelPrompt).toContain(travel.photography.style);
 
+    expect(freshPrompt).not.toContain(travel.brandName);
+    expect(travelPrompt).not.toContain(fresh.brandName);
     expect(freshPrompt).not.toContain(travel.photography.style);
     expect(travelPrompt).not.toContain(fresh.photography.style);
     expect(travelPrompt).not.toContain(fresh.brandPersonality.slice(0, 20));

@@ -16,7 +16,7 @@ export class UnknownReferenceError extends Error {
   readonly code = "unknown_reference";
   constructor(
     readonly field: "pageId" | "brandSegmentId" | "mainColorId",
-    readonly value: string,
+    value: string,
   ) {
     super(`Unknown ${field}: ${value}`);
   }
@@ -36,13 +36,13 @@ export class UnauthorizedError extends Error {
   readonly code = "unauthorized";
 }
 
-/** The tenant used up its daily generation attempts (DD13): protects the provider budget. */
+/** The application-level daily attempt check rejected a new run. */
 export class DailyLimitError extends Error {
   readonly code = "daily_limit_reached";
 }
 
 /**
- * rate_limit / transient: worth one automatic retry (D8).
+ * rate_limit / transient: worth one automatic retry.
  * billing / safety / invalid: retrying the same request will not help; show the reason.
  */
 export const PROVIDER_ERROR_KINDS = [
@@ -55,7 +55,6 @@ export const PROVIDER_ERROR_KINDS = [
 export type ProviderErrorKind = (typeof PROVIDER_ERROR_KINDS)[number];
 
 export class ProviderError extends Error {
-  readonly code = "provider_error";
   constructor(
     message: string,
     readonly kind: ProviderErrorKind,

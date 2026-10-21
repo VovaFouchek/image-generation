@@ -17,10 +17,6 @@ const PLACEMENTS = [
   "A close-up on the main subject with a shallow depth of field",
 ] as const;
 
-/**
- * Plans the variations of one brief. A single generation uses the brief's own composition;
- * a batch walks the angle × placement grid, so no two items share a composition.
- */
 export function planVariations(brief: VisualBrief, count: number): Variation[] {
   if (count === 1) {
     return [

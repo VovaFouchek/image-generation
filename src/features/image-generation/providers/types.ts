@@ -3,7 +3,6 @@ import type { AspectRatio } from "../domain/options";
 export const IMAGE_SIZES = ["1K", "2K", "4K"] as const;
 export type ImageSize = (typeof IMAGE_SIZES)[number];
 
-// 2.1 documents only these three levels (no "low").
 export const THINKING_LEVELS = ["minimal", "medium", "high"] as const;
 export type ThinkingLevel = (typeof THINKING_LEVELS)[number];
 
@@ -21,17 +20,10 @@ export interface ProviderConfig {
   thinkingLevel: ThinkingLevel;
 }
 
-export interface ReferenceImage {
-  mimeType: string;
-  /** base64, no data: prefix */
-  data: string;
-}
-
 export interface ImageGenerationInput {
   config: ProviderConfig;
   systemInstruction: string;
   prompt: string;
-  referenceImages?: ReferenceImage[];
   /** Stable per item, e.g. the item id. Used for tracing and by the mock. */
   idempotencyKey: string;
   /** 1 for the first try; increases with each retry. */

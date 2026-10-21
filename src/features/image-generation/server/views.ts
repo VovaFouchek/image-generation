@@ -30,7 +30,7 @@ export function toItemView(item: GenerationItem, now = Date.now()): ItemView {
     case "queued":
       return { ...base, status: "queued" };
     case "running":
-      // DD5: a run past its lease died with its function. Show it as a retryable failure; a
+      // A run past its lease died with its function. Show it as a retryable failure; a
       // retry claims it again, which the lease allows.
       if (now - Date.parse(item.runningSince) > ITEM_LEASE_MS) {
         return {

@@ -13,9 +13,6 @@ import type {
   ThinkingLevel,
 } from "./types";
 
-// Nano Banana via the Gemini API (`generateContent`, not the beta Interactions API).
-// Request shape and error handling: .agents/docs/nano-banana-prompting-research.md §1.5.
-
 /** The slice of the SDK this provider uses; injectable for tests. */
 export interface GeminiModelsClient {
   models: {
@@ -60,12 +57,7 @@ export class GeminiImageProvider implements ImageProvider {
         contents: [
           {
             role: "user",
-            parts: [
-              ...(input.referenceImages ?? []).map((image) => ({
-                inlineData: image,
-              })),
-              { text: input.prompt },
-            ],
+            parts: [{ text: input.prompt }],
           },
         ],
         config: {

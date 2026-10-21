@@ -8,7 +8,6 @@ import {
   type ProviderErrorKind,
 } from "../domain/errors";
 import { BATCH_SIZE } from "../domain/options";
-import { mockKnowledgeSource } from "../knowledge/mock-knowledge";
 import type {
   ImageGenerationInput,
   ImageProvider,
@@ -20,6 +19,7 @@ import type { GenerationBatch } from "../repository/types";
 import {
   demoTenant,
   freshRequest,
+  mockKnowledgeSource,
   travelRequest,
   withNoPeopleRule,
 } from "../test-fixtures";
@@ -109,18 +109,6 @@ describe("generation service", () => {
     expect(provider.calls).toHaveLength(0);
   });
 
-  it("snapshots the provider config on every planned item", async () => {
-    const ctx = context("demo-fresh", scriptedProvider([]));
-    const batch = await createSingleBatch(ctx, freshRequest());
-    expect(onlyItem(batch).config).toEqual({
-      provider: "fake",
-      model: "fake",
-      aspectRatio: "16:9",
-      imageSize: "1K",
-      thinkingLevel: "medium",
-    });
-  });
-
   it.each([
     { model: "another-expensive-model" },
     { imageSize: "2K" },
@@ -180,7 +168,7 @@ describe("generation service", () => {
   );
 
   describe("variations", () => {
-    it("reuse the example's request and brief for 15 items", async () => {
+    it("reuse the example's request, brief and provider settings for 15 items", async () => {
       const ctx = context("demo-fresh", scriptedProvider([]));
       const single = await succeededSingle(ctx);
       const batch = await createVariationsBatch(ctx, single.id);
@@ -189,6 +177,12 @@ describe("generation service", () => {
       expect(batch.sourceBatchId).toBe(single.id);
       expect(batch.brief).toEqual(single.brief);
       expect(batch.request).toEqual(single.request);
+      for (const item of batch.items) {
+        expect(item.config).toEqual(onlyItem(single).config);
+        expect(item.prompt.systemInstruction).toBe(
+          onlyItem(single).prompt.systemInstruction,
+        );
+      }
     });
 
     it("cannot start from another tenant's batch", async () => {

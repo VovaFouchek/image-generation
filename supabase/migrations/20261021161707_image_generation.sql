@@ -1,5 +1,5 @@
--- Image generation feature (stage D, implementation plan §14).
--- Tenant isolation is enforced here, by RLS under the signed-in user's session (D16): the app
+-- Image generation feature
+-- Tenant isolation is enforced here, by RLS under the signed-in user's session: the app
 -- never uses the secret key in the generation flow. In the platform, tenants and
 -- tenant_members already exist; they are created here so the policies have something to use.
 

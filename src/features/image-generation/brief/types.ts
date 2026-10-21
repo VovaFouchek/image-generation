@@ -1,9 +1,7 @@
 import type { AspectRatio, Format } from "../domain/options";
 import type { RuleStrength } from "../knowledge/types";
 
-// Internal brief contract (.agents/skills/goldfizh-image-workflow/references/brief-contract.md).
-// Built automatically on "Generate"; never shown to or edited by the user in this prototype.
-// It carries resolved values (not just IDs), so a stored brief alone reproduces the prompt.
+// Resolved values preserve the inputs needed to reconstruct a stored brief's prompt.
 
 export const BRIEF_SCHEMA_VERSION = 1;
 

@@ -8,7 +8,7 @@ export const DEMO_SESSION_PATH = "/api/demo-session";
 const FALLBACK_PATH = "/image-generator";
 
 /**
- * Pages call this before rendering (DD12): with no session, or with ?tenant= naming another
+ * Pages call this before rendering: with no session, or with ?tenant= naming another
  * demo tenant, the visitor goes through /api/demo-session, which signs in and comes back.
  * Only that route sets cookies, so a prefetch can never switch tenants.
  */

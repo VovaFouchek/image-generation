@@ -4,7 +4,7 @@ import { ensureDemoSession } from "@/lib/demo-session";
 type SearchParams = Record<string, string | string[] | undefined>;
 
 /**
- * Host-side gate (DD12): renders the page only with a demo session for the requested tenant
+ * Host-side gate: renders the page only with a demo session for the requested tenant
  * (?tenant=), otherwise sends the visitor through /api/demo-session and back to this URL.
  */
 export async function DemoSessionGate({

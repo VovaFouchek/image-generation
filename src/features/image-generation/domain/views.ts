@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-// What the browser receives. Brief, prompts and provider config stay on the server: the
-// prototype has no brief preview, and client knowledge should not leak into the UI.
-// Schemas are the single source of the types: the server builds these shapes, the client
-// validates responses against them.
+// Public responses exclude briefs, prompts and provider settings.
 
 const errorKindSchema = z.enum([
   "rate_limit",

@@ -3,9 +3,7 @@ import { COLOR_MODES, FORMAT_KEYS, STYLES } from "./options";
 
 const note = z.string().trim().min(1).max(200);
 
-// Layer 3 of the brief: what the user asks for. Validated at the API boundary.
-// Tenant is deliberately absent: it comes from the server-side session, never from the client.
-// Page, segment and colour are IDs from the tenant's knowledge; buildBrief resolves them.
+// Tenant identity comes from the server session, never the request.
 export const generationRequestSchema = z
   .object({
     pageId: z.string().min(1),

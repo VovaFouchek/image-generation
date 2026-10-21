@@ -1,4 +1,4 @@
-// DEMO: one prepared account per fictional demo tenant (D14, D16). Not secret: the switcher
+// DEMO: one prepared account per fictional demo tenant. Not secret: the switcher
 // deliberately lets any visitor sign in to these, so they only ever see invented data. The
 // password lives in the server env (DEMO_ACCOUNT_PASSWORD). Imported by the seed script too,
 // so this module must stay plain data.

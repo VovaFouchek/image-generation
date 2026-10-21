@@ -14,7 +14,6 @@ export type SelectProps = Omit<ComponentProps<"select">, "children"> & {
   placeholder?: string;
 };
 
-/** Native select styled as Figma's dropdown (3:3): accessible and form-friendly by default. */
 export function Select({
   options,
   placeholder,

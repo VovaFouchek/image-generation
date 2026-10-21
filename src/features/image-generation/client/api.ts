@@ -6,7 +6,6 @@ import { batchViewSchema, itemViewSchema } from "../domain/views";
 export class ApiError extends Error {
   constructor(
     readonly status: number,
-    readonly code: string,
     message: string,
     readonly field?: string,
     readonly issues: { path: PropertyKey[]; message: string }[] = [],
@@ -31,12 +30,8 @@ async function request<T>(
 
 function toApiError(status: number, body: unknown): ApiError {
   if (typeof body !== "object" || body === null) {
-    return new ApiError(status, "request_failed", "Request failed");
+    return new ApiError(status, "Request failed");
   }
-  const code =
-    "error" in body && typeof body.error === "string"
-      ? body.error
-      : "request_failed";
   const message =
     "message" in body && typeof body.message === "string"
       ? body.message
@@ -56,7 +51,7 @@ function toApiError(status: number, body: unknown): ApiError {
             : [],
         )
       : [];
-  return new ApiError(status, code, message, field, issues);
+  return new ApiError(status, message, field, issues);
 }
 
 export function createBatch(body: CreateBatchBody) {

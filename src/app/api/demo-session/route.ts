@@ -4,7 +4,7 @@ import { safeReturnPath } from "@/lib/demo-session";
 import { getHostEnv } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-// DEMO sign-in (D16): ?tenant= picks which prepared demo account to sign in with; the server
+// DEMO sign-in: ?tenant= picks which prepared demo account to sign in with; the server
 // authenticates it and @supabase/ssr stores the real session in cookies. It proves nothing about
 // the visitor — the demo accounts are open on purpose and hold only fictional data.
 export async function GET(request: NextRequest) {
