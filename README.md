@@ -3,16 +3,20 @@
 On-brand image generation for the Goldfizh Content OS, built as a standalone feature that can be
 plugged into the existing multi-tenant platform later.
 
-**Live:** _URL follows after the first Vercel deploy_ · **Stack:** Next.js 16, TypeScript, Tailwind
-v4, Supabase (Postgres, Auth, Storage), Google Gemini (Nano Banana 2.1)
+**Live:** https://image-generation-amber-nu.vercel.app/image-generator — the first visit signs in
+as the demo client _Freshday Market_; switch to _Coast & Stay_ with
+[`?tenant=demo-travel`](https://image-generation-amber-nu.vercel.app/image-generator?tenant=demo-travel).
+Each demo client can start a limited number of generations per day.
+
+**Stack:** Next.js 16, TypeScript, Tailwind v4, Supabase (Postgres, Auth, Storage), Google Gemini
+(Nano Banana 2.1)
 
 - **Screen 1 — single image.** Pick a page, audience segment, style, colours, main colour and
   format; generate one example image to check the direction.
 - **Screen 2 — Beeldbank, 15 variations.** One click generates 15 variations with the same style
   and settings, three at a time, with a status per image and a retry for failed ones.
 
-All client data in this repository is fictional and labelled **(demo)**. Goldfizh's internal
-vision and real client guidelines were not available, so both are invented stand-ins.
+All client data in this repository is fictional and labelled **(demo)**.
 
 ## How the three layers combine
 
@@ -145,15 +149,3 @@ tests/integration/              tenant isolation test
 Import the GitHub repository, keep the Next.js defaults, and add the "Vercel" variables from the
 table. `vercel.json` pins functions to `dub1` (Dublin), next to the database in eu-west-1. The
 run route has `maxDuration = 120`; one image takes 10–16 s.
-
-## Known limitations
-
-- The batch is driven by the browser (three requests at a time). Closing the tab pauses it; a
-  reload resumes it from the URL. A background queue would remove that dependency.
-- Variations come from the text brief only; reference images are supported by the provider
-  interface but switched off.
-- The current demo knowledge has no rule that conflicts with an audience, so the 422 conflict
-  path is covered by unit tests rather than visible in the UI.
-- Signed-in demo users can write rows through the Supabase Data API directly; the daily limit
-  bounds what that can cost.
-- Gemini API is used with the `global` endpoint; EU-only processing would need Vertex AI.
