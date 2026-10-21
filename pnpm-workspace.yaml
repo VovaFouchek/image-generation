@@ -1,0 +1,7 @@
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+  # postinstall script is not shipped in the published package
+  "@google/genai": false
+  # postinstall only prints a version check
+  protobufjs: false

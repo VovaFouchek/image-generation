@@ -1,0 +1,9 @@
+# Agent docs and installed skills are authored/managed outside the app code
+.agents/
+.claude/
+AGENTS.md
+CLAUDE.md
+skills-lock.json
+
+pnpm-lock.yaml
+supabase/.temp/
